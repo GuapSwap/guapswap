@@ -1,0 +1,3 @@
+object GuapSwapApp extends App {
+
+}
