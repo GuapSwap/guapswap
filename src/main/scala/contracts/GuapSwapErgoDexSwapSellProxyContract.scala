@@ -1,7 +1,7 @@
 package contracts
 
 object GuapSwapErgoDexSwapSellProxyContract {
-    def getProxyScript: String = {
+    def getScript: String = {
         val script: String = s"""
         {
             // ====== Contract Info ====== //
@@ -40,13 +40,13 @@ object GuapSwapErgoDexSwapSellProxyContract {
             val DexFeePerTokenDenom: Long   = getVar[Long](5).get
             val MaxErgoDexMinerFee: Long    = getVar[Long](6).get
             val PoolNFT: Coll[Byte]         = getVar[Coll[Byte]](7).get
-            val newPK: SigmaProp            = getVar[SigmaProp](9).get
+            val NewPK: SigmaProp            = getVar[SigmaProp](9).get
 
             // Replacing the ErgoDex variable values in the SwapSell template with their corresponding value from the transaction context.
             val positions: Coll[Int] = Coll(0, 2, 8, 9, 10, 11, 12, 14, 17, 18, 22)
-            
+
             val newValues: Coll[T] = Coll(
-                PK,
+                NewPK,
                 BaseAmount,
                 PoolNFT,
                 QuoteId,
