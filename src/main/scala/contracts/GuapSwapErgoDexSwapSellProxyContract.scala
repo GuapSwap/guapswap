@@ -45,7 +45,7 @@ object GuapSwapErgoDexSwapSellProxyContract {
             // Replacing the ErgoDex variable values in the SwapSell template with their corresponding value from the transaction context.
             val positions: Coll[Int] = Coll(0, 2, 8, 9, 10, 11, 12, 14, 17, 18, 22)
 
-            val newValues: Coll[T] = Coll(
+            val newValues: Coll[T] = Coll( // Do I need to call substConstants multiple times with different Coll[T] for the different types?
                 NewPK,
                 BaseAmount,
                 PoolNFT,
