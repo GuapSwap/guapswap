@@ -93,6 +93,7 @@ object GuapSwapErgoDexSwapSellProxyContract {
 
             val validRefund = {
                 validRefundBox &&
+                validGuapSwapServiceFeeBox &&
                 OUTPUTS.size == 3
             }
 
