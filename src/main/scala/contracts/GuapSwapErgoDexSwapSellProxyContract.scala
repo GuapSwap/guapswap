@@ -42,34 +42,54 @@ object GuapSwapErgoDexSwapSellProxyContract {
             val NewPK: SigmaProp            = getVar[SigmaProp](9).get
 
             // Replacing the ErgoDex variable values in the SwapSell template with their corresponding value from the transaction context.
-            val positions_Long: Coll[Int] = Coll(2, 10, 11, 12, 14, 17, 18, 22)
-            val positions_Coll_Byte: Coll[Int] = Coll(8, 9)
-            val positions_SigmaProp: Coll[Int] = Coll(0)
+            // val positions_Long: Coll[Int] = Coll(2, 10, 11, 12, 14, 17, 18, 22)
+            // val positions_Coll_Byte: Coll[Int] = Coll(8, 9)
+            // val positions_SigmaProp: Coll[Int] = Coll(0)
 
-            val newValues_Long: Coll[Long] = Coll(
-                FeeNum,
-                MinQuoteAmount,
-                BaseAmount,
-                DexFeePerTokenNum,
-                DexFeePerTokenDenom,
-                MaxMinerFee
-            )
+            // val newValues_Long: Coll[Long] = Coll(
+            //     BaseAmount,
+            //     MinQuoteAmount,
+            //     DexFeePerTokenNum,
+            //     DexFeePerTokenDenom,
+            //     FeeNum,
+            //     BaseAmount,
+            //     FeeNum,
+            //     MaxMinerFee
+            // )
 
-            val newValues_Coll_Byte: Coll[Coll[Bytes]] = Coll(
-                PoolNFT,
-                QuoteId
-            )
+            // val newValues_Coll_Byte: Coll[Coll[Bytes]] = Coll(
+            //     PoolNFT,
+            //     QuoteId
+            // )
 
-            val newValues_SigmaProp: Coll[SigmaProp] = Coll(
-                NewPK
+            // val newValues_SigmaProp: Coll[SigmaProp] = Coll(
+            //     NewPK
+            // )
+
+            // Alternatively
+            val positions = Coll(0, 2, 8, 9, 10, 11, 12, 14, 17, 18, 22)
+
+            val newValues: Coll[Any] = Coll(
+                NewPK.toSigmaProp,
+                BaseAmount.toLong,
+                PoolNFT.toCollOfByte,
+                QuoteId.toCollOfByte,
+                MinQuoteAmount.toLong,
+                DexFeePerTokenNum.toLong,
+                DexFeePerTokenDenom.toLong,
+                FeeNum.toLong,
+                BaseAmount.toLong,
+                FeeNum.toLong,
+                MaxMinerFee.toLong
             )
 
             // Will insert new values based on the following order: Long => Coll[Byte] => SigmaProp
-            val newErgoDexSwapSellTemplate_Long: Coll[Byte] = substConstants(ErgoDexSwapSellTemplate, positions_Long, newValues_Long)
-            val newErgoDexSwapSellTemplate_Coll_Byte: Coll[Byte] = substConstants(newErgoDexSwapSellTemplate_Long, positions_Coll_Byte, newValues_Coll_Byte)
-            val newErgoDexSwapSellTemplate_SigmaProp: Coll[Byte] = substConstants(newErgoDexSwapSellTemplate_Coll_Byte, positions_SigmaProp, newValues_SigmaProp)
-            
-            val newErgoDexSwapSellTemplate: Coll[Byte] = newErgoDexSwapSellTemplate_SigmaProp
+            // val newErgoDexSwapSellTemplate_Long: Coll[Byte] = substConstants(ErgoDexSwapSellTemplate, positions_Long, newValues_Long)
+            // val newErgoDexSwapSellTemplate_Coll_Byte: Coll[Byte] = substConstants(newErgoDexSwapSellTemplate_Long, positions_Coll_Byte, newValues_Coll_Byte)
+            // val newErgoDexSwapSellTemplate_SigmaProp: Coll[Byte] = substConstants(newErgoDexSwapSellTemplate_Coll_Byte, positions_SigmaProp, newValues_SigmaProp)
+            // val newErgoDexSwapSellTemplate: Coll[Byte] = newErgoDexSwapSellTemplate_SigmaProp
+
+            val newErgoDexSwapSellTemplate: Coll[Byte] = substConstants(ErgoDexSwapSellContractTemplate, positions, newValues)
 
             // ====== GuapSwap ErgoDex SwapSell Proxy Contract Conditions ====== //
             // Check that a valid ErgoDex SwapSell Box is an output.
