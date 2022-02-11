@@ -20,7 +20,6 @@ object GuapSwapErgoDexSwapSellProxyContract {
             // ====== ErgoDex Settings Variables ====== //
             // First column of indicies: Index of "getVar[T](tag: Int): Option[T]" corresponding to the appropriate ContextVariable.
             // Second column of indicies: Index of "positions: Coll[Int]" parameter of "substContants[T](scriptBytes: Coll[Bytes], positions: Coll[Int], newValues: Coll[T]): Coll[Byte]" corresponding to the associated variable that is to be inserted into the ErgoDex swap contract template.
-            //
             // 0  => FeeNum: Long                   => 14, 18
             // 1  => QuoteId: Coll[Byte]            => 9
             // 2  => MinQuoteAmount: Long           => 10
