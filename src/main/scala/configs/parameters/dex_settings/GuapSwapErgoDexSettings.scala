@@ -1,7 +1,7 @@
 package configs.parameters.dex_settings
 
 /**
-  * Class representing the ErgoDex settings from guapswap_config.json
+  * Class representing the ErgoDex settings.
   *
   * @param swapTokenTicker
   * @param slippageTolerancePercentage

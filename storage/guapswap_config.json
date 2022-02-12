@@ -7,7 +7,7 @@
         "wallet": {
             "mnemonic": "",
             "password": "",
-            "mnemomicPassword": ""
+            "mnemonicPassword": ""
         },
         "networkType": "TESTNET"
     },
