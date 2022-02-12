@@ -13,7 +13,7 @@
     },
     "parameters": {
         "guapswapProtocolSettings": {
-            "minerAddress": "",
+            "userAddress": "",
             "serviceFees": {
                 "protocolFeePercentage": 0.0025,
                 "uiFeePercentage": 0.0,

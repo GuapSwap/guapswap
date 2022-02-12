@@ -7,6 +7,6 @@ package configs.parameters.protocol_settings
   * @param serviceFees
   */
 case class GuapSwapProtocolSettings(
-    val minerAddress: String,
+    val userAddress: String,
     val serviceFees: GuapSwapServiceFees
 )

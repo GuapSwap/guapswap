@@ -5,7 +5,6 @@ object GuapSwapErgoDexSwapSellProxyContract {
         val script: String = s"""
         {
             // ====== Contract Info ====== //
-            // Filename: GuapSwapErgoDexSwapSellProxyContract.scala
             // Description: Proxy contract which holds the miner's payout from the mining pool, and will perform a swap-sell with ErgoDex.
             // Author: Luca D’Angelo
 
@@ -115,18 +114,21 @@ object GuapSwapErgoDexSwapSellProxyContract {
                 refundBox.propositionBytes == PK
             }
 
+            // For a valid swap to occur, the following conditions must be met.
             val validGuapSwap = {
                 validErgoDexSwapBox &&
                 validGuapSwapServiceFeeBox &&
                 OUTPUTS.size == 3
             }
 
+            // For a valid refund to occur, the following conditions must be met.
             val validRefund = {
                 validRefundBox &&
                 validGuapSwapServiceFeeBox &&
                 OUTPUTS.size == 3
             }
 
+            // One of these three conditions must be met in order to validate the script and execute the transaction with the corresponding action.
             SigmaProp(validGuapSwap || validRefund || PK)
         }
         """.stripMargin
