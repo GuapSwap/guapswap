@@ -1,0 +1,32 @@
+{
+    "node": {
+        "nodeApi": {
+            "apiUrl": "",
+            "apiKey": ""
+        },
+        "wallet": {
+            "mnemonic": "",
+            "password": "",
+            "mnemomicPassword": ""
+        },
+        "networkType": "TESTNET"
+    },
+    "parameters": {
+        "guapswapProtocolSettings": {
+            "minerAddress": "",
+            "serviceFees": {
+                "protocolFeePercentage": 0.0025,
+                "uiFeePercentage": 0.0,
+                "minerFee": 0.002
+            }
+        },
+        "dexSettings": {
+            "ergoDexSettings": {
+                "swapTokenTicker": "SigUSD",
+                "slippageTolerancePercentage": 0.001,
+                "nitro": 1.2,
+                "minerFee": 0.002
+            }
+        }
+    } 
+}

@@ -9,7 +9,8 @@ lazy val root = project
 
     libraryDependencies ++= Seq(
       "org.scalatest" %% "scalatest" % "3.2.9" % Test,
-      "org.ergoplatform" %% "ergo-appkit" % "4.0.6"
+      "org.ergoplatform" %% "ergo-appkit" % "4.0.6",
+      "com.google.code.gson" % "gson" % "2.8.5"
     ),
 
     resolvers ++= Seq(
