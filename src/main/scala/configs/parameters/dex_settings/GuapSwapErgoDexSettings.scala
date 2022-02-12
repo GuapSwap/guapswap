@@ -1,5 +1,7 @@
 package configs.parameters.dex_settings
 
+import dex.ergodex.ErgoDexConstants
+
 /**
   * Class representing the ErgoDex settings.
   *
@@ -10,9 +12,9 @@ package configs.parameters.dex_settings
   */
 case class GuapSwapErgoDexSettings(
     val swapTokenTicker: String,
-    val slippageTolerancePercentage: Double = 0.001,
-    val nitro: Double = 1.2,
-    val minerFee: Double = 0.002
+    val slippageTolerancePercentage: Double = ErgoDexConstants.DEFAULT_ERGODEX_SLIPPAGE_TOLERANCE_PERCENTAGE,
+    val nitro: Double = ErgoDexConstants.DEFAULT_ERGODEX_NITRO,
+    val minerFee: Double = ErgoDexConstants.DEFAULT_ERGODEX_MINER_FEE
 )
 
 

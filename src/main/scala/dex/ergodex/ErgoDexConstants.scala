@@ -33,4 +33,9 @@ object ErgoDexConstants {
     
     // Prefix added to user PK before insertion into swap swell contract ErgoScript.
     final val SigmaPropConstPrefixHex: String = "08cd"
+
+    // Default ErgoDex settings
+    final val DEFAULT_ERGODEX_SLIPPAGE_TOLERANCE_PERCENTAGE: Double = 0.001
+    final val DEFAULT_ERGODEX_NITRO: Double = 1.2
+    final val DEFAULT_ERGODEX_MINER_FEE: Double = 0.002
 }

@@ -21,4 +21,10 @@ object GuapSwapConstants {
 
     // Will make this the actual service fee contract P2S address in the future, for now just my TESTNET test_wallet P2PK address
     final val serviceFeeContract: String = "9ej8AEGCpNxPaqfgisJTU2RmYG91bWfK1hu2xT34i5Xdw4czidX"
+
+    // Default service fee constants
+    final val DEFAULT_PROTOCOL_FEE_PERCENTAGE: Double = 0.0025
+    final val DEFAULT_PROTOCOL_UI_FEE_PERCENTAGE: Double = 0.0
+    final val DEFAULT_PROTOCOL_MINER_FEE: Double = 0.002
+    
 }

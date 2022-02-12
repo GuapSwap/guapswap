@@ -1,5 +1,7 @@
 package configs.parameters.protocol_settings
 
+import protocol.GuapSwapConstants
+
 /**
   * Class representing the protocol service fees.
   *
@@ -8,7 +10,7 @@ package configs.parameters.protocol_settings
   * @param minerFee
   */
 case class GuapSwapServiceFees(
-    val protocolFeePercentage: Double = 0.0025,
-    val uiFeePercentage: Double = 0.0,
-    val minerFee: Double = 0.002
+    val protocolFeePercentage: Double = GuapSwapConstants.DEFAULT_PROTOCOL_FEE_PERCENTAGE,
+    val uiFeePercentage: Double = GuapSwapConstants.DEFAULT_PROTOCOL_UI_FEE_PERCENTAGE,
+    val minerFee: Double = GuapSwapConstants.DEFAULT_PROTOCOL_MINER_FEE
 )

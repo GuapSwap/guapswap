@@ -8,12 +8,13 @@ object GuapSwapApp extends App{
         val configFilePath: String = "storage/guapswap_config.json"
         
         val result = GuapSwapConfig.load(configFilePath) match {
-            case Success(conf) => {
+            case Success(config) => {
 
-                // All AppKit logic goes here
-                println(conf)
+                // AppKit logic goes here
+                println(config)
             }
-            case Failure(exc) => exc
+
+            case Failure(exception) => exception
         }
 
 
