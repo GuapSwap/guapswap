@@ -8,10 +8,10 @@ object GuapSwapUtils {
 
     // HashMap of possible Ergo Assets
     final val validErgoAssets: HashMap[String, DexAsset] = HashMap(
-        "ERG" -> DexAsset("0", 0, "ERG", 9),
-        "SigUSD" -> DexAsset("03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04", 0, "SigUSD", 2),
-        "Erdoge" -> DexAsset("36aba4b4a97b65be491cf9f5ca57b5408b0da8d0194f30ec8330d1e8946161c1", 0, "Erdoge", 0),
-        "WT_ERG" -> DexAsset("ef802b475c06189fdbf844153cdc1d449a5ba87cce13d11bb47b5a539f27f12b", 0, "WT_ERG", 9)
+        "ERG" -> DexAsset("0", "ERG", 9),
+        "SigUSD" -> DexAsset("03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04", "SigUSD", 2),
+        "Erdoge" -> DexAsset("36aba4b4a97b65be491cf9f5ca57b5408b0da8d0194f30ec8330d1e8946161c1", "Erdoge", 0),
+        "WT_ERG" -> DexAsset("ef802b475c06189fdbf844153cdc1d449a5ba87cce13d11bb47b5a539f27f12b", "WT_ERG", 9)
     )
 
     // Will make this the actual service fee contract P2S address in the future, for now just my TESTNET test_wallet P2PK address

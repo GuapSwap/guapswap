@@ -12,7 +12,5 @@ import org.ergoplatform.ErgoBox.{TokenId}
 case class DexPool(
   val poolId: String,
   val assetX: DexAsset,
-  val assetY: DexAsset,
-  val fee: Long,
-
+  val assetY: DexAsset
 )

@@ -9,7 +9,6 @@ package protocol
   */
 case class DexAsset(
   val id: String,
-  val amount: Long,
   val ticker: String,
   val decimals: Int
 )

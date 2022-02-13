@@ -22,8 +22,7 @@ object ErgoDexUtils {
         "ERG_2_SigUSD" -> DexPool(
             poolId = "9916d75132593c8b07fe18bd8d583bda1652eed7565cf41a4738ddd90fc992ec",
             assetX = validErgoDexAssets.get("ERG").get,
-            assetY = validErgoDexAssets.get("SigUSD").get,
-            fee = 0
+            assetY = validErgoDexAssets.get("SigUSD").get
         )
      )
 
@@ -51,39 +50,6 @@ object ErgoDexUtils {
         val minerFeeNanoErgs: Long = GuapSwapUtils.calculateMinerFee(minerFee)
         val minExecutionFee: Long = 3L * minerFeeNanoErgs
         minExecutionFee
-    }
-
-    /**
-      * Calculate min output amount
-      * 
-      * @param swapInputAmount
-      * @param maxSlippagePercentage
-      * @param xAmount
-      * @param yAmount
-      * @param feeNum
-      * @param feeDenom
-      * @return
-      */
-    def calcMinOutputAmount(swapInputAmount: Long, maxSlippagePercentage: Double, xAmount: Long, yAmount: Long, feeNum: Long, feeDenom: Long): Long = {
-        val slippage: Long = (maxSlippagePercentage * 100).toLong
-        val outputAmount: Long = yAmount * swapInputAmount * feeNum / ((xAmount + (xAmount * slippage) / (100L * 100L)) * feeDenom + swapInputAmount * feeNum)
-        outputAmount
-    }
-
-    /**
-      * Calculate the swap extremums
-      *
-      * @param minExecutionFee
-      * @param nitro
-      * @param minOutputAmount
-      * @return
-      */
-    def swapExtremums(minExecutionFee: Long, nitro: Double, minOutputAmount: Long): (Long, (Long, Long, Long, Long)) = {
-        val exFeePerToken = minExecutionFee / minOutputAmount 
-        val adjustedMinExecutionFee = Math.floor(exFeePerToken * minOutputAmount)
-        val maxExecutionFee = Math.floor(minExecutionFee * nitro)
-        val maxOutputAmount = Math.floor(maxExecutionFee / exFeePerToken)
-        (exFeePerToken, (adjustedMinExecutionFee.toLong, maxExecutionFee.toLong, minOutputAmount, maxOutputAmount.toLong))
     }
 
     /**
