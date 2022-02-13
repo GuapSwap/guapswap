@@ -16,7 +16,7 @@ import java.io.FileReader
 case class GuapSwapConfig(
     val node: GuapSwapNodeConfig,
     val parameters: GuapSwapParameters
-  )
+  ) 
 
 object GuapSwapConfig {
     
@@ -27,10 +27,18 @@ object GuapSwapConfig {
      * @return Try[GuapSwapConfig]
      */
     def load(configFilePath: String): Try[GuapSwapConfig] = Try {
-        val configFile: File = new File(configFilePath); // Load the file
-        val configReader: FileReader = new FileReader(configFile); // Read the file
-        val gson: Gson = new GsonBuilder().create(); // Create the Gson object to parse json
-        val config: GuapSwapConfig = gson.fromJson(configReader, classOf[GuapSwapConfig]); // Parse the json and create the GuapSwapConfig object
+
+        // Load the file
+        val configFile: File = new File(configFilePath);
+
+        // Read the file
+        val configReader: FileReader = new FileReader(configFile);
+
+        // Create Gson object to parse json
+        val gson: Gson = new GsonBuilder().create();
+
+        // Parse the json and create the GuapSwapConfig object
+        val config: GuapSwapConfig = gson.fromJson(configReader, classOf[GuapSwapConfig]);
         config
     }
 

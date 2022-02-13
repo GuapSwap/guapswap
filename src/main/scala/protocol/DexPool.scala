@@ -1,5 +1,7 @@
 package protocol
 
+import org.ergoplatform.ErgoBox.{TokenId}
+
 /**
   * Class to represent a dex pool.
   *
@@ -10,6 +12,7 @@ package protocol
 case class DexPool(
   val poolId: String,
   val assetX: DexAsset,
-  val assetY: DexAsset
+  val assetY: DexAsset,
+  val fee: Long,
 
 )

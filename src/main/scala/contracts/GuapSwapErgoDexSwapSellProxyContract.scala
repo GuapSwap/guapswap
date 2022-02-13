@@ -13,8 +13,9 @@ object GuapSwapErgoDexSwapSellProxyContract {
             val ErgoDexSwapSellContractTemplate: Coll[Byte]
             val GuapSwapServiceFeePercentageNum: Long = 5  
             val GuapSwapServiceFeePercentageDenom: Long = 1000
-            val GuapSwapServiceFeeContractTemplate: Coll[Byte]
+            val GuapSwapServiceFeeContractTemplatePropBytes: Coll[Byte]
             val GuapSwapMinerFee: Long
+            val MinErgoDexExecutionFee: Long
 
             // ====== ErgoDex Settings Variables ====== //
             // First column of indicies: Index of "getVar[T](tag: Int): Option[T]" corresponding to the appropriate ContextVariable.
@@ -66,7 +67,7 @@ object GuapSwapErgoDexSwapSellProxyContract {
             // )
 
             // Alternatively
-            val positions = Coll(0, 2, 8, 9, 10, 11, 12, 14, 17, 18, 22)
+            val positions: Coll[Int] = Coll(0, 2, 8, 9, 10, 11, 12, 14, 17, 18, 22)
 
             val newValues: Coll[Any] = Coll(
                 NewPK.toSigmaProp,
@@ -92,12 +93,14 @@ object GuapSwapErgoDexSwapSellProxyContract {
 
             // ====== GuapSwap ErgoDex SwapSell Proxy Contract Conditions ====== //
             // Check that a valid ErgoDex SwapSell Box is an output.
+            val MinBoxValue: Long = 1000000
             val validErgoDexSwapBox = {
                 val userSwapBox: Box = OUTPUTS(0)
-                val validSwapBoxValue: Long = SELF.value - (GuapSwapServiceFeeNum * SELF.value / GuapSwapServiceFeeDenom) - GuapSwapMinerFee
-                BaseAmount == validSwapBoxValue &&
-                userSwapBox.value == validSwapBoxValue && 
-                userSwapBox.propositionBytes == newErgoDexSwapSellTemplate
+                val minValueOfFees: Long = (GuapSwapService FeeNum * SELF.value / GuapSwapServiceFeeDenom) + GuapSwapMinerFee + MinErgoDexExecutionFee + MaxMinerFee
+                BaseAmount >= minValueOfFees &&
+                SELF.value >= BaseAmount &&
+                userSwapBox.value >= SELF.value - BaseAmount - minValueOfFees && 
+                userSwapBox.propositionBytes == newErgoDexSwapSellTemplatePropBytes
             }
 
             // Check that a valid GuapSwap Service Fee Box is an output.
@@ -110,7 +113,7 @@ object GuapSwapErgoDexSwapSellProxyContract {
             // Check that a valid Refund Box is an output if initiated by user.
             val validRefundBox = {
                 val refundBox: Box = OUTPUTS(0)
-                refundBox.value == SELF.value - (GuapSwapServiceFeeNum * SELF.value / GuapSwapServiceFeeDenom) - GuapSwapMinerFee &&
+                refundBox.value == SELF.value - MinBoxValue - (GuapSwapServiceFeeNum * SELF.value / GuapSwapServiceFeeDenom) - GuapSwapMinerFee &&
                 refundBox.propositionBytes == PK
             }
 

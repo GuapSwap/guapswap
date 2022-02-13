@@ -22,10 +22,10 @@
         },
         "dexSettings": {
             "ergoDexSettings": {
-                "swapTokenTicker": "SigUSD",
+                "swapAssetTicker": "SigUSD",
                 "slippageTolerancePercentage": 0.001,
                 "nitro": 1.2,
-                "minerFee": 0.002
+                "minerFee": 0.002 
             }
         }
     } 

@@ -8,7 +8,8 @@ package protocol
   * @param decimals
   */
 case class DexAsset(
-  val ticker: String,
   val id: String,
+  val amount: Long,
+  val ticker: String,
   val decimals: Int
 )
