@@ -11,7 +11,7 @@ import configs.parameters.GuapSwapParameters
 object ErgoDexSwapSell {
 
     /**
-      * Calculate min output amount
+      * Calculate min output amount of ErgoDex LP
       * 
       * @param swapInputAmount
       * @param maxSlippagePercentage
@@ -19,7 +19,7 @@ object ErgoDexSwapSell {
       * @param yAmount
       * @param feeNum
       * @param feeDenom
-      * @return 
+      * @return Minimum output token amount from ErgoDex LP for given input amount.
       */
     def calcMinOutputAmount(swapInputAmount: Long, maxSlippagePercentage: Double, xAmount: Long, yAmount: Long, feeNum: Long, feeDenom: Long): Long = {
         val slippage: Long = (maxSlippagePercentage * 100).toLong
@@ -33,7 +33,7 @@ object ErgoDexSwapSell {
       * @param minExecutionFee
       * @param nitro
       * @param minOutputAmount
-      * @return
+      * @return Tuple containing the swam extremums.
       */
     def swapExtremums(minExecutionFee: Long, nitro: Double, minOutputAmount: Long): (Long, (Long, Long, Long, Long)) = {
         val exFeePerToken = minExecutionFee / minOutputAmount 
@@ -50,7 +50,7 @@ object ErgoDexSwapSell {
       * @param proxyBox
       * @param poolBox
       * @param parameters
-      * @return 
+      * @return Parameters to be inserted as context variables with correct ErgoScript types.
       */
     def swapSellParams(proxyBox: InputBox, poolBox: InputBox, parameters: GuapSwapParameters): ErgoDexSwapSellParams = {
         val poolNFT = poolBox.getTokens().get(0)
