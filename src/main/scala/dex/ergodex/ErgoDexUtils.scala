@@ -31,30 +31,38 @@ object ErgoDexUtils {
         "SigUSD" -> GuapSwapUtils.validErgoAssets.get("SigUSD").get,
         "SigRSV" -> GuapSwapUtils.validErgoAssets.get("SigRSV").get,
         "Erdoge" -> GuapSwapUtils.validErgoAssets.get("Erdoge").get,
-        "LunaDog" -> GuapSwapUtils.validErgoAssets.get("LunaDog").get
+        "LunaDog" -> GuapSwapUtils.validErgoAssets.get("LunaDog").get,
+        "kushti" -> GuapSwapUtils.validErgoAssets.get("kushti").get,
+        "WT_ERG" -> GuapSwapUtils.validErgoAssets.get("WT_ERG").get,
+        "WT_ADA" -> GuapSwapUtils.validErgoAssets.get("WT_ADA").get
     )
 
     // Storing all of the valid ErgoDex pools available, based on the available assets.
     final val validErgoDexPools: HashMap[String, DexPool] = HashMap(
         "ERG_2_SigUSD" -> DexPool(
-            poolId = "9916d75132593c8b07fe18bd8d583bda1652eed7565cf41a4738ddd90fc992ec",
-            assetX = validErgoDexAssets.get("ERG").get,
-            assetY = validErgoDexAssets.get("SigUSD").get
+          poolId = "9916d75132593c8b07fe18bd8d583bda1652eed7565cf41a4738ddd90fc992ec",
+          assetX = validErgoDexAssets.get("ERG").get,
+          assetY = validErgoDexAssets.get("SigUSD").get
         ),
         "ERG_2_SigRSV" -> DexPool(
-            poolId = "1d5afc59838920bb5ef2a8f9d63825a55b1d48e269d7cecee335d637c3ff5f3f",
-            assetX = validErgoDexAssets.get("ERG").get,
-            assetY = validErgoDexAssets.get("SigRSV").get
+          poolId = "1d5afc59838920bb5ef2a8f9d63825a55b1d48e269d7cecee335d637c3ff5f3f",
+          assetX = validErgoDexAssets.get("ERG").get,
+          assetY = validErgoDexAssets.get("SigRSV").get
         ),
         "ERG_2_Ergoge" -> DexPool(
-            poolId = "3d4fdb931917647f4755ada29d13247686df84bd8aea060d22584081bd11ba69",
-            assetX = validErgoDexAssets.get("ERG").get,
-            assetY = validErgoDexAssets.get("Erdoge").get
+          poolId = "3d4fdb931917647f4755ada29d13247686df84bd8aea060d22584081bd11ba69",
+          assetX = validErgoDexAssets.get("ERG").get,
+          assetY = validErgoDexAssets.get("Erdoge").get
         ),
         "ERG_2_LunaDog" -> DexPool(
-            poolId = "c1b9c430249bd97326042fdb09c0fb6fe1455d498a20568cc64390bfeca8aff2",
-            assetX = validErgoDexAssets.get("ERG").get,
-            assetY = validErgoDexAssets.get("LunaDog").get
+          poolId = "c1b9c430249bd97326042fdb09c0fb6fe1455d498a20568cc64390bfeca8aff2",
+          assetX = validErgoDexAssets.get("ERG").get,
+          assetY = validErgoDexAssets.get("LunaDog").get
+        ),
+        "Erdoge_2_kushti" -> DexPool(
+          poolId = "65fa572bc4a7007e5a6450c9af2bfa1594e6dfb43b667027f1930eefddeac7bf",
+          assetX = validErgoDexAssets.get("Erdoge").get,
+          assetY = validErgoDexAssets.get("kushti").get
         )
      )
 

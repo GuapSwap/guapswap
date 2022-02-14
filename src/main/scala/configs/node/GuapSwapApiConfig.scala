@@ -1,5 +1,7 @@
 package configs.node
 
+import protocol.GuapSwapUtils
+
 /**
   * Class representing the node Api.
   *
@@ -7,7 +9,7 @@ package configs.node
   * @param apiKey
   */
 case class GuapSwapApiConfig(
-    val apiUrl: String,
+    val apiUrl: String = GuapSwapUtils.DEFAULT_PUBLIC_NODE_URL,
     val apiKey: String
 )
 

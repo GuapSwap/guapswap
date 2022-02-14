@@ -8,6 +8,10 @@ import configs.parameters.protocol_settings.{GuapSwapProtocolSettings, GuapSwapS
 import special.collection.Coll
 import special.sigma.SigmaProp
 import org.ergoplatform.ErgoAddress
+import sigmastate.Values
+import sigmastate.Values.{ErgoTree}
+import org.ergoplatform.appkit.ErgoTreeTemplate
+
 
 object ErgoDexSwapSell {
 
@@ -114,6 +118,13 @@ object ErgoDexSwapSell {
 
         val swapsellparams = new ErgoDexSwapSellParams(paramPK, paramPoolFeeNum, paramQuoteId, paramMinQuoteAmount, paramBaseAmount, paramDexFeePerTokenNum, paramDexFeePerTokenDenom, paramMaxMinerFee, paramPoolNFTId)
         swapsellparams
+    }
+
+    def getSubstSwapSellContractWithParams(swapsellparams: ErgoDexSwapSellParams): ErgoTree = {
+        val swapSellErgoTree: ErgoTree = Address.create(ErgoDexUtils.ERGODEX_SWAPSELL_SAMPLE_CONTRACT).getErgoAddress().script
+        swapSellErgoTree
+        //val substitutedSwapSellErgoTree = ErgoTree.substConstants()
+        
     }
 
 }

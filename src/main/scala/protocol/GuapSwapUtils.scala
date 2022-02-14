@@ -9,11 +9,14 @@ import scala.collection.immutable.HashMap
 object GuapSwapUtils {
 
     // Constant representing the storage location within the project repository of the guapswap_config.json file and guapswap_proxy.json file
-    final val GUAPSWAP_CONFIG_FILE_PATH = "storage/guapswap_config.json"
-    final val GUAPSWAP_PROXY_FILE_PATH = "storage/guapswap_proxy.json"
+    final val GUAPSWAP_CONFIG_FILE_PATH: String = "storage/guapswap_config.json"
+    final val GUAPSWAP_PROXY_FILE_PATH: String = "storage/guapswap_proxy.json"
+
+    // Default public node URL
+    final val DEFAULT_PUBLIC_NODE_URL: String = ""
 
     // Default service fee constants
-    final val DEFAULT_PROTOCOL_FEE_PERCENTAGE: Double = 0.0025D // 0.0 for GuapSwap-Ronin CLI
+    final val DEFAULT_PROTOCOL_FEE_PERCENTAGE: Double = 0.0025D // 0.0 for GuapSwap-Ronin CLI only
     final val DEFAULT_PROTOCOL_UI_FEE_PERCENTAGE: Double = 0.0D // 0.0 for all CLI versions, only charged for web version with UI.
     final val DEFAULT_PROTOCOL_MINER_FEE: Double = 0.002D
 
