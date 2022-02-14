@@ -10,10 +10,10 @@ object GuapSwapErgoDexSwapSellProxyContract {
 
             // ====== Contract Hard-Coded Constants ====== //
             val PK: SigmaProp
-            val ErgoDexSwapSellContractTemplate: Coll[Byte]
+            val ErgoDexSwapSellContractSample: Coll[Byte]
             val GuapSwapServiceFeePercentageNum: Long = 5  
             val GuapSwapServiceFeePercentageDenom: Long = 1000
-            val GuapSwapServiceFeeContractTemplatePropBytes: Coll[Byte]
+            val GuapSwapServiceFeeContract: Coll[Byte]
             val GuapSwapMinerFee: Long
             val MinErgoDexExecutionFee: Long
 
@@ -93,7 +93,6 @@ object GuapSwapErgoDexSwapSellProxyContract {
 
             // ====== GuapSwap ErgoDex SwapSell Proxy Contract Conditions ====== //
             // Check that a valid ErgoDex SwapSell Box is an output.
-            val MinBoxValue: Long = 1000000
             val validErgoDexSwapBox = {
                 val userSwapBox: Box = OUTPUTS(0)
                 val minValueOfFees: Long = (GuapSwapService FeeNum * SELF.value / GuapSwapServiceFeeDenom) + GuapSwapMinerFee + MinErgoDexExecutionFee + MaxMinerFee
