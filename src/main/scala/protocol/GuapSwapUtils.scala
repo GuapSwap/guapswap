@@ -13,8 +13,8 @@ object GuapSwapUtils {
     final val GUAPSWAP_PROXY_FILE_PATH = "storage/guapswap_proxy.json"
 
     // Default service fee constants
-    final val DEFAULT_PROTOCOL_FEE_PERCENTAGE: Double = 0.0025D
-    final val DEFAULT_PROTOCOL_UI_FEE_PERCENTAGE: Double = 0.0D
+    final val DEFAULT_PROTOCOL_FEE_PERCENTAGE: Double = 0.0025D // 0.0 for GuapSwap-Ronin CLI
+    final val DEFAULT_PROTOCOL_UI_FEE_PERCENTAGE: Double = 0.0D // 0.0 for all CLI versions, only charged for web version with UI.
     final val DEFAULT_PROTOCOL_MINER_FEE: Double = 0.002D
 
     // GuapSwap service fee contract sample P2S address, for now just my TESTNET test_wallet P2PK address
@@ -44,21 +44,12 @@ object GuapSwapUtils {
     def ergToNanoErg(erg: Double): Long = (erg * 1000000000L).toLong
 
     /**
-      * Calculate the service fee, this include the ui fee and the procotol fee
-      *
-      * @param protocolFee
-      * @param protocolUIFee
-      * @return Total Service fee in nanoErgs.
-      */
-    def calculateServiceFee(protocolFee: Double, protocolUIFee: Double): Long = ergToNanoErg(protocolFee) + ergToNanoErg(protocolUIFee)
-
-    /**
       * Calculate the miner fee in nanoERGs
       *
       * @param minerFee
       * @return Miner fee in nanoERGs.
       */
-    def calculateMinerFee(minerFee: Double): Long = {
+    def convertMinerFee(minerFee: Double): Long = {
         val minerFeeNanoErgs = ergToNanoErg(minerFee)
         if (minerFeeNanoErgs < MIN_BOX_VALUE) {
             ergToNanoErg(DEFAULT_PROTOCOL_MINER_FEE)
@@ -68,14 +59,42 @@ object GuapSwapUtils {
     }
 
     /**
+      * Calculate the total protocol fees, this include the ui fee and the procotol fee, but NOT the protocol miner fee
+      *
+      * @param protocolFee
+      * @param protocolUIFee
+      * @param payout
+      * @return Total protocol fee in nanoErgs.
+      */
+    def calculateTotalProtocolFee(protocolFeePercentage: Double, protocolUIFeePercentage: Double, payout: Long): Long = ergToNanoErg(protocolFeePercentage * payout) + ergToNanoErg(protocolUIFeePercentage * payout)
+
+    /**
+      * Calculate the service fee, this include the total protocol fee and the protocol miner fee
+      *
+      * @param totalProtocolFee
+      * @param protocolMinerFee
+      * @return Total service fee in nanoErgs.
+      */
+    def calculateServiceFee(totolProtocolFee: Long, protocolMinerFee: Long): Long = totolProtocolFee + protocolMinerFee
+
+    /**
       * Method to calculate the minValue for the Guap Swap transaction to occur, including interaction with the dex.
       * 
       * @param serviceFee
-      * @param protocolMinerFee
       * @param totalDexFee The minium total fees charged by the dex, including mining fees at that stage.
-      * @return The minimum value in nanoErgs that the transaction can cost.
+      * @return The minimum value in nanoErgs that the transaction can cost, on both the GuapSwap stage and dex stage.
       */
-    def minValueOfGuapSwapFees(serviceFee: Long, protocolMinerFee: Long, totalDexFee: Long): Long = serviceFee + protocolMinerFee + totalDexFee
+    def minValueOfTotalFees(serviceFee: Long, totalDexFee: Long): Long = serviceFee + totalDexFee
+
+
+    /**
+      * Method to calculate the base amount to be swapped at the dex.
+      *
+      * @param payout
+      * @param totalFee
+      * @return Base amount to be swapped in nanoErgs.
+      */
+    def calculateBaseAmount(payout: Long, totalFee: Long): Long = payout - totalFee
     
     /**
       * Method to convert a decimal number to a rational fraction.

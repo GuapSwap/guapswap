@@ -14,5 +14,5 @@ case class GuapSwapErgoDexSettings(
     val swapAssetTicker: String,
     val slippageTolerancePercentage: Double = ErgoDexUtils.DEFAULT_ERGODEX_SLIPPAGE_TOLERANCE_PERCENTAGE,
     val nitro: Double = ErgoDexUtils.DEFAULT_ERGODEX_NITRO,
-    val minerFee: Double = ErgoDexUtils.DEFAULT_ERGODEX_MINER_FEE
+    val ergodexMinerFee: Double = ErgoDexUtils.DEFAULT_ERGODEX_MINER_FEE
 )

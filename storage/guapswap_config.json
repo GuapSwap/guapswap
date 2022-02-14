@@ -16,16 +16,16 @@
             "userAddress": "",
             "serviceFees": {
                 "protocolFeePercentage": 0.0025,
-                "uiFeePercentage": 0.0,
-                "minerFee": 0.002
+                "protocolUIFeePercentage": 0.0,
+                "protocolMinerFee": 0.002
             }
         },
         "dexSettings": {
-            "ergoDexSettings": {
+            "ergodexSettings": {
                 "swapAssetTicker": "SigUSD",
                 "slippageTolerancePercentage": 0.001,
                 "nitro": 1.2,
-                "minerFee": 0.002 
+                "ergodexMinerFee": 0.002 
             }
         }
     } 

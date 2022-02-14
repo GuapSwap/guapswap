@@ -64,11 +64,20 @@ object ErgoDexUtils {
       * @param minerFee
       * @return The minimum execution fee in nanoErgs.
       */
-    def calcMinExecutionFee(minerFee: Double): Long = {
-        val minerFeeNanoErgs: Long = GuapSwapUtils.calculateMinerFee(minerFee)
+    def calculateMinExecutionFee(minerFee: Double): Long = {
+        val minerFeeNanoErgs: Long = GuapSwapUtils.convertMinerFee(minerFee)
         val minExecutionFee: Long = 3L * minerFeeNanoErgs
         minExecutionFee
     }
+
+    /**
+      * Calculate the minium value of total ErgoDex fees.
+      *
+      * @param minExecutionFee
+      * @param minerFee
+      * @return The minimum ErgoDex fee in nanoErgs.
+      */
+    def minValueOfTotalErgoDexFees(minExecutionFee: Long, minerFee: Long): Long = minExecutionFee + minerFee
 
     /**
       * Add the PK prefix to the user Pk address.

@@ -6,6 +6,6 @@ package configs.parameters.dex_settings
   * @param ergoDexSettings
   */
 case class GuapSwapDexSettings(
-    val ergoDexSettings: GuapSwapErgoDexSettings
+    val ergodexSettings: GuapSwapErgoDexSettings
 )
 
