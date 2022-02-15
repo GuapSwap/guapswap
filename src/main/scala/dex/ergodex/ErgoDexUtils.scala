@@ -69,12 +69,11 @@ object ErgoDexUtils {
     /**
       * Calculate the minium execution fee.
       *
-      * @param minerFee
+      * @param minerFee Miner fee in nanoErgs.
       * @return The minimum execution fee in nanoErgs.
       */
-    def calculateMinExecutionFee(minerFee: Double): Long = {
-        val minerFeeNanoErgs: Long = GuapSwapUtils.convertMinerFee(minerFee)
-        val minExecutionFee: Long = 3L * minerFeeNanoErgs
+    def calculateMinExecutionFee(minerFee: Long): Long = {
+        val minExecutionFee: Long = 3L * minerFee
         minExecutionFee
     }
 
@@ -97,6 +96,5 @@ object ErgoDexUtils {
         val pkWithPrefix = SIGMAPROP_CONST_PREFIX_HEX + pk
         pkWithPrefix
     }
-
     
 }

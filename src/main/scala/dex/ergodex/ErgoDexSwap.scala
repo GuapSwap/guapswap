@@ -12,7 +12,9 @@ import sigmastate.Values
 import sigmastate.Values.{ErgoTree}
 import org.ergoplatform.appkit.ErgoTreeTemplate
 
-
+/**
+  * Object to store methods and constants relevant to an ErgoDex Swap
+  */
 object ErgoDexSwapSell {
 
     /**
@@ -76,21 +78,21 @@ object ErgoDexSwapSell {
         // Get access to the parameter settings determined in the guapswap_config.json file
         val guapswapSettings: GuapSwapProtocolSettings = parameters.guapswapProtocolSettings
         val ergodexSettings: GuapSwapErgoDexSettings = parameters.dexSettings.ergodexSettings
-
         
-        
-        // Calculate the fees to determine the base amount of ERG to be swapped
+        // Calculate the guapswap fees
         val guapswapTotalProtocolFee: Long = GuapSwapUtils.calculateTotalProtocolFee(guapswapSettings.serviceFees.protocolFeePercentage, guapswapSettings.serviceFees.protocolUIFeePercentage, payout)
         val guapswapMinerFee: Long = GuapSwapUtils.convertMinerFee(guapswapSettings.serviceFees.protocolMinerFee)
         val guapswapServiceFee: Long = GuapSwapUtils.calculateServiceFee(guapswapTotalProtocolFee, guapswapMinerFee)
         
-        val ergodexMinExecutionFee: Long = ErgoDexUtils.calculateMinExecutionFee(ergodexSettings.ergodexMinerFee)
-        
+        // Calculate the ergodex fees
         val ergodexMinerFee: Long = GuapSwapUtils.convertMinerFee(ergodexSettings.ergodexMinerFee)
+        val ergodexMinExecutionFee: Long = ErgoDexUtils.calculateMinExecutionFee(ergodexMinerFee)
         val minValueOfTotalErgoDexFees: Long = ErgoDexUtils.minValueOfTotalErgoDexFees(ergodexMinExecutionFee, ergodexMinerFee)
+        
+        // Minimum value of total fees
         val minValueOfTotalFees: Long = GuapSwapUtils.minValueOfTotalFees(guapswapServiceFee, minValueOfTotalErgoDexFees)
         
-        // Caluclate the base amount
+        // Caluclate the base amount to be swapped
         val baseAmount: Long = GuapSwapUtils.calculateBaseAmount(payout, minValueOfTotalFees)
 
         // Calculate the minimum quote amount for the given input swap base amount
@@ -120,11 +122,17 @@ object ErgoDexSwapSell {
         swapsellparams
     }
 
+    /**
+      * Substitute the swap sell parameters into the sample contract.
+      *
+      * @param swapsellparams
+      * @return New contracts with updated variables. 
+      */
     def getSubstSwapSellContractWithParams(swapsellparams: ErgoDexSwapSellParams): ErgoTree = {
         val swapSellErgoTree: ErgoTree = Address.create(ErgoDexUtils.ERGODEX_SWAPSELL_SAMPLE_CONTRACT).getErgoAddress().script
         swapSellErgoTree
         //val substitutedSwapSellErgoTree = ErgoTree.substConstants()
-        
+        // Stuff, need help here. 
     }
 
 }

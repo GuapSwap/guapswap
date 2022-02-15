@@ -1,4 +1,3 @@
-import com.omnivore.dedcline._
 import protocol.GuapSwapUtils
 import configs.GuapSwapConfig
 import scala.util.{Try, Success, Failure}
