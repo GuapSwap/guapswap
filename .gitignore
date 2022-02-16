@@ -2,6 +2,7 @@
 *.log
 
 # workspace
+.DS_Store
 .vscode
 .metals
 .bloop
