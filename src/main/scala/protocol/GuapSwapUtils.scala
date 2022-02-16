@@ -13,7 +13,7 @@ object GuapSwapUtils {
     final val GUAPSWAP_PROXY_FILE_PATH: String = "storage/guapswap_proxy.json"
 
     // Default public node URL
-    final val DEFAULT_PUBLIC_NODE_URL: String = ""
+    final val DEFAULT_API_URL: String = ""
 
     // Default service fee constants
     final val DEFAULT_PROTOCOL_FEE_PERCENTAGE: Double = 0.0025D // 0.0 for GuapSwap-Ronin CLI only

@@ -9,7 +9,7 @@ import protocol.GuapSwapUtils
   * @param apiKey
   */
 case class GuapSwapApiConfig(
-    val apiUrl: String = GuapSwapUtils.DEFAULT_PUBLIC_NODE_URL,
+    val apiUrl: String = GuapSwapUtils.DEFAULT_API_URL,
     val apiKey: String
 )
 

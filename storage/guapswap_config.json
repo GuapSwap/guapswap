@@ -1,7 +1,7 @@
 {
     "node": {
         "nodeApi": {
-            "apiUrl": "",
+            "apiUrl": "https://ergo-testnet.getblok.io:3056",
             "apiKey": ""
         },
         "wallet": {

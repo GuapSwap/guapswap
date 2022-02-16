@@ -11,8 +11,8 @@ object GuapSwapErgoDexSwapSellProxyContract {
             // ====== Contract Hard-Coded Constants ====== //
             val PK: SigmaProp
             val ErgoDexSwapSellContractSample: Coll[Byte]
-            val GuapSwapServiceFeePercentageNum: Long = 5  
-            val GuapSwapServiceFeePercentageDenom: Long = 1000
+            val GuapSwapServiceFeePercentageNum: Long  
+            val GuapSwapServiceFeePercentageDenom: Long
             val GuapSwapServiceFeeContract: Coll[Byte]
             val GuapSwapMinerFee: Long
             val MinErgoDexExecutionFee: Long

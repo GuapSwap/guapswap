@@ -11,9 +11,12 @@ import org.ergoplatform.ErgoAddress
 import sigmastate.Values
 import sigmastate.Values.{ErgoTree}
 import org.ergoplatform.appkit.ErgoTreeTemplate
+import org.ergoplatform.appkit.JavaHelpers
+import sigmastate.SType
+import org.ergoplatform.appkit.Iso
 
 /**
-  * Object to store methods and constants relevant to an ErgoDex Swap
+  * Object to store methods relevant to an ErgoDex Swap
   */
 object ErgoDexSwapSell {
 
@@ -126,13 +129,18 @@ object ErgoDexSwapSell {
       * Substitute the swap sell parameters into the sample contract.
       *
       * @param swapsellparams
-      * @return New contracts with updated variables. 
+      * @return New contract with updated variables. 
       */
-    def getSubstSwapSellContractWithParams(swapsellparams: ErgoDexSwapSellParams): ErgoTree = {
-        val swapSellErgoTree: ErgoTree = Address.create(ErgoDexUtils.ERGODEX_SWAPSELL_SAMPLE_CONTRACT).getErgoAddress().script
-        swapSellErgoTree
-        //val substitutedSwapSellErgoTree = ErgoTree.substConstants()
-        // Stuff, need help here. 
-    }
+    // def getSubstSwapSellContractWithParams(swapsellparams: ErgoDexSwapSellParams): ErgoTree = {
+      
+    //   val swapSellErgoTree: ErgoTree = JavaHelpers.decodeStringToErgoTree(ErgoDexUtils.ERGODEX_SWAPSELL_SAMPLE_CONTRACT)
+
+    //   val indexedSequenceOfConstants: IndexedSeq[Constant[SType]] 
+
+    //   val test: Constant[SType] = Iso.
+ 
+    //   val substitutedSwapSellErgoTree = ErgoTree.substConstants(swapSellErgoTree.root, )
+      
+    // }
 
 }
