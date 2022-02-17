@@ -1,7 +1,7 @@
 {
     "node": {
         "nodeApi": {
-            "apiUrl": "https://ergo-testnet.getblok.io:3056",
+            "apiUrl": "http://213.239.193.208:9053/",
             "apiKey": ""
         },
         "wallet": {
@@ -9,11 +9,11 @@
             "password": "",
             "mnemonicPassword": ""
         },
-        "networkType": "TESTNET"
+        "networkType": "MAINNET"
     },
     "parameters": {
         "guapswapProtocolSettings": {
-            "userAddress": "",
+            "userAddress": "9fSek6bWQ2yusFHyJARD95KPTCrn5rfEav6msGZpxQZQvcBADQ9",
             "serviceFees": {
                 "protocolFeePercentage": 0.0025,
                 "protocolUIFeePercentage": 0.0,

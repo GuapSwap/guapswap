@@ -2,6 +2,7 @@ package protocol
 
 import org.ergoplatform.appkit.Address
 import scala.collection.immutable.HashMap
+import spire.syntax.fractional
 
 /**
   * Object representing constants and methods relevant to GuapSwap.
@@ -13,7 +14,10 @@ object GuapSwapUtils {
     final val GUAPSWAP_PROXY_FILE_PATH: String = "storage/guapswap_proxy.json"
 
     // Default public node URL
-    final val DEFAULT_API_URL: String = ""
+    final val DEFAULT_API_URL: String = "http://213.239.193.208:9053/"
+
+    // Default GetBlok TESTNET node URL
+    final val DEFAULT_GETBLOK_TESTNET_API_URL: String = "http://ergo-testnet.getblok.io:3056"
 
     // Default service fee constants
     final val DEFAULT_PROTOCOL_FEE_PERCENTAGE: Double = 0.0025D // 0.0 for GuapSwap-Ronin CLI only
@@ -21,7 +25,7 @@ object GuapSwapUtils {
     final val DEFAULT_PROTOCOL_MINER_FEE: Double = 0.002D
 
     // GuapSwap service fee contract sample P2S address, for now just my TESTNET test_wallet P2PK address
-    final val GUAPSWAP_SERVICE_FEE_CONTRACT_SAMPLE: String = "9ej8AEGCpNxPaqfgisJTU2RmYG91bWfK1hu2xT34i5Xdw4czidX"
+    final val GUAPSWAP_PROTOCOL_FEE_CONTRACT_SAMPLE: String = "9ej8AEGCpNxPaqfgisJTU2RmYG91bWfK1hu2xT34i5Xdw4czidX"
 
     // Minimum box value in nanoErgs
     final val MIN_BOX_VALUE: Long = 1000000L
@@ -53,12 +57,25 @@ object GuapSwapUtils {
       * @return Miner fee in nanoERGs.
       */
     def convertMinerFee(minerFee: Double): Long = {
-        val minerFeeNanoErgs = ergToNanoErg(minerFee)
-        if (minerFeeNanoErgs < MIN_BOX_VALUE) {
-            ergToNanoErg(DEFAULT_PROTOCOL_MINER_FEE)
-        } else {
-            minerFeeNanoErgs
-        }
+      val minerFeeNanoErgs = ergToNanoErg(minerFee)
+      if (minerFeeNanoErgs < MIN_BOX_VALUE) {
+          ergToNanoErg(DEFAULT_PROTOCOL_MINER_FEE)
+      } else {
+          minerFeeNanoErgs
+      }
+    }
+
+    /**
+      * Calculate the total protocol fee percentage. 
+      *
+      * @param protocolFeePercentage
+      * @param protocolUIFeePercentage
+      * @return The numerator and denominator of the total protocol fee percentage
+      */
+    def calculateTotalProtocolFeePercentage(protocolFeePercentage: Double, protocolUIFeePercentage: Double): (Long, Long) = {
+      val percentageSum: Double = protocolFeePercentage + protocolUIFeePercentage
+      val fraction: (Long, Long) = decimalToFraction(percentageSum)
+      fraction
     }
 
     /**
@@ -106,14 +123,18 @@ object GuapSwapUtils {
       * @return Tuple of the numerator and denominator representing the decimal number.
       */
     def decimalToFraction(number: Double): (Long, Long) = {
-      number.toString().split(".").toList match {
+      val bigdecimalNumber: BigDecimal = BigDecimal.apply(number).underlying().stripTrailingZeros()
+      val listMatch: List[String] = bigdecimalNumber.toString.split("\\.").toList
+      val fractionTuple: (Long, Long) = listMatch match {
         case List(whole, fractional) => {
           val numDecimals = fractional.length()
           val denominator = Math.pow(10, numDecimals).toLong
           val numerator = whole.toLong * denominator + fractional.toLong
           (numerator, denominator)
         }
+        case _ => (number.toLong, number.toLong)
       }
+      fractionTuple
     }
     
     

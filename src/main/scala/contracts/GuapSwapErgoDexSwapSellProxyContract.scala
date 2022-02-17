@@ -1,5 +1,8 @@
 package contracts
 
+/**
+  * Object describing the GuapSwap ErgoDex swap-sell proxy contract
+  */
 object GuapSwapErgoDexSwapSellProxyContract {
     def getScript: String = {
         val script: String = s"""
@@ -9,13 +12,13 @@ object GuapSwapErgoDexSwapSellProxyContract {
             // Author: Luca D’Angelo
 
             // ====== Contract Hard-Coded Constants ====== //
-            val PK: SigmaProp
-            val ErgoDexSwapSellContractSample: Coll[Byte]
-            val GuapSwapServiceFeePercentageNum: Long  
-            val GuapSwapServiceFeePercentageDenom: Long
-            val GuapSwapServiceFeeContract: Coll[Byte]
-            val GuapSwapMinerFee: Long
-            val MinErgoDexExecutionFee: Long
+            // val PK: SigmaProp
+            // val ErgoDexSwapSellContractSample: Coll[Byte]
+            // val GuapSwapProtocolFeePercentageNum: Long  
+            // val GuapSwapProtocolFeePercentageDenom: Long
+            // val GuapSwapProtocolFeeContract: Coll[Byte]
+            // val GuapSwapMinerFee: Long
+            // val MinErgoDexExecutionFee: Long
 
             // ====== ErgoDex Settings Variables ====== //
             // First column of indicies: Index of "getVar[T](tag: Int): Option[T]" corresponding to the appropriate ContextVariable.
@@ -42,12 +45,38 @@ object GuapSwapErgoDexSwapSellProxyContract {
             val NewPK: SigmaProp            = getVar[SigmaProp](9).get
 
             // Replacing the ErgoDex variable values in the SwapSell template with their corresponding value from the transaction context.
-            // val positions_Long: Coll[Int] = Coll(2, 10, 11, 12, 14, 17, 18, 22)
-            // val positions_Coll_Byte: Coll[Int] = Coll(8, 9)
-            // val positions_SigmaProp: Coll[Int] = Coll(0)
+            val positions_Long: Coll[Int] = Coll(2, 10, 11, 12, 14, 17, 18, 22)
+            val positions_Coll_Byte: Coll[Int] = Coll(8, 9)
+            val positions_SigmaProp: Coll[Int] = Coll(0)
 
-            // val newValues_Long: Coll[Long] = Coll(
+            val newValues_Long: Coll[Long] = Coll(
+                BaseAmount,
+                MinQuoteAmount,
+                DexFeePerTokenNum,
+                DexFeePerTokenDenom,
+                FeeNum,
+                BaseAmount,
+                FeeNum,
+                MaxMinerFee
+            )
+
+            val newValues_Coll_Byte: Coll[Coll[Bytes]] = Coll(
+                PoolNFT,
+                QuoteId
+            )
+
+            val newValues_SigmaProp: Coll[SigmaProp] = Coll(
+                NewPK
+            )
+
+            // Alternatively
+            // val positions: Coll[Int] = Coll(0, 2, 8, 9, 10, 11, 12, 14, 17, 18, 22)
+
+            // val newValues: Coll[Any] = Coll(
+            //     NewPK,
             //     BaseAmount,
+            //     PoolNFT,
+            //     QuoteId,
             //     MinQuoteAmount,
             //     DexFeePerTokenNum,
             //     DexFeePerTokenDenom,
@@ -57,81 +86,55 @@ object GuapSwapErgoDexSwapSellProxyContract {
             //     MaxMinerFee
             // )
 
-            // val newValues_Coll_Byte: Coll[Coll[Bytes]] = Coll(
-            //     PoolNFT,
-            //     QuoteId
-            // )
-
-            // val newValues_SigmaProp: Coll[SigmaProp] = Coll(
-            //     NewPK
-            // )
-
-            // Alternatively
-            val positions: Coll[Int] = Coll(0, 2, 8, 9, 10, 11, 12, 14, 17, 18, 22)
-
-            val newValues: Coll[Any] = Coll(
-                NewPK.toSigmaProp,
-                BaseAmount.toLong,
-                PoolNFT.toCollOfByte,
-                QuoteId.toCollOfByte,
-                MinQuoteAmount.toLong,
-                DexFeePerTokenNum.toLong,
-                DexFeePerTokenDenom.toLong,
-                FeeNum.toLong,
-                BaseAmount.toLong,
-                FeeNum.toLong,
-                MaxMinerFee.toLong
-            )
-
             // Will insert new values based on the following order: Long => Coll[Byte] => SigmaProp
-            // val newErgoDexSwapSellTemplate_Long: Coll[Byte] = substConstants(ErgoDexSwapSellTemplate, positions_Long, newValues_Long)
-            // val newErgoDexSwapSellTemplate_Coll_Byte: Coll[Byte] = substConstants(newErgoDexSwapSellTemplate_Long, positions_Coll_Byte, newValues_Coll_Byte)
-            // val newErgoDexSwapSellTemplate_SigmaProp: Coll[Byte] = substConstants(newErgoDexSwapSellTemplate_Coll_Byte, positions_SigmaProp, newValues_SigmaProp)
-            // val newErgoDexSwapSellTemplate: Coll[Byte] = newErgoDexSwapSellTemplate_SigmaProp
+            val newErgoDexSwapSellContractSample_Long: Coll[Byte] = substConstants(ErgoDexSwapSellContractSample, positions_Long, newValues_Long)
+            val newErgoDexSwapSellContractSample_Coll_Byte: Coll[Byte] = substConstants(newErgoDexSwapSellContractSample_Long, positions_Coll_Byte, newValues_Coll_Byte)
+            val newErgoDexSwapSellContractSample_SigmaProp: Coll[Byte] = substConstants(newErgoDexSwapSellContractSample_Coll_Byte, positions_SigmaProp, newValues_SigmaProp)
+            val newErgoDexSwapSellContractSample: Coll[Byte] = newErgoDexSwapSellContractSample_SigmaProp
 
-            val newErgoDexSwapSellTemplate: Coll[Byte] = substConstants(ErgoDexSwapSellContractTemplate, positions, newValues)
+            // val newErgoDexSwapSellContractSample: Coll[Byte] = substConstants(ErgoDexSwapSellContractSample, positions, newValues)
 
             // ====== GuapSwap ErgoDex SwapSell Proxy Contract Conditions ====== //
             // Check that a valid ErgoDex SwapSell Box is an output.
             val validErgoDexSwapBox = {
                 val userSwapBox: Box = OUTPUTS(0)
-                val minValueOfFees: Long = (GuapSwapService FeeNum * SELF.value / GuapSwapServiceFeeDenom) + GuapSwapMinerFee + MinErgoDexExecutionFee + MaxMinerFee
+                val minValueOfFees: Long = (GuapSwapProtocolFeePercentageNum * SELF.value / GuapSwapProtocolFeePercentageDenom) + GuapSwapMinerFee + MinErgoDexExecutionFee + MaxMinerFee
                 BaseAmount >= minValueOfFees &&
                 SELF.value >= BaseAmount &&
                 userSwapBox.value >= SELF.value - BaseAmount - minValueOfFees && 
-                userSwapBox.propositionBytes == newErgoDexSwapSellTemplatePropBytes
+                userSwapBox.propositionBytes == newErgoDexSwapSellContractSample
             }
 
             // Check that a valid GuapSwap Service Fee Box is an output.
-            val validGuapSwapServiceFeeBox = {
+            val validGuapSwapProtocolFeeBox = {
                 val serviceFeeBox: Box = OUTPUTS(1)
-                serviceFeeBox.value == (GuapSwapServiceFeeNum * SELF.value / GuapSwapServiceFeeDenom) &&
-                serviceFeeBox.propositionBytes == GuapSwapServiceFeeContractTemplate
+                serviceFeeBox.value == (GuapSwapProtocolFeePercentageNum * SELF.value / GuapSwapProtocolFeePercentageDenom) &&
+                serviceFeeBox.propositionBytes == GuapSwapProtocolFeeContract
             }
 
             // Check that a valid Refund Box is an output if initiated by user.
             val validRefundBox = {
                 val refundBox: Box = OUTPUTS(0)
-                refundBox.value == SELF.value - MinBoxValue - (GuapSwapServiceFeeNum * SELF.value / GuapSwapServiceFeeDenom) - GuapSwapMinerFee &&
-                refundBox.propositionBytes == PK
+                refundBox.value == SELF.value - (GuapSwapProtocolFeePercentageNum * SELF.value / GuapSwapProtocolFeePercentageDenom) - GuapSwapMinerFee &&
+                refundBox.propositionBytes == PK.propBytes
             }
 
             // For a valid swap to occur, the following conditions must be met.
             val validGuapSwap = {
                 validErgoDexSwapBox &&
-                validGuapSwapServiceFeeBox &&
+                validGuapSwapProtocolFeeBox &&
                 OUTPUTS.size == 3
             }
 
             // For a valid refund to occur, the following conditions must be met.
             val validRefund = {
                 validRefundBox &&
-                validGuapSwapServiceFeeBox &&
+                validGuapSwapProtocolFeeBox &&
                 OUTPUTS.size == 3
             }
 
             // One of these three conditions must be met in order to validate the script and execute the transaction with the corresponding action.
-            SigmaProp(validGuapSwap || validRefund || PK)
+            sigmaProp(validGuapSwap || validRefund || PK)
         }
         """.stripMargin
         script
