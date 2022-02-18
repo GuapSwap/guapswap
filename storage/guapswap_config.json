@@ -18,7 +18,8 @@
                 "protocolFeePercentage": 0.0025,
                 "protocolUIFeePercentage": 0.0,
                 "protocolMinerFee": 0.002
-            }
+            },
+            "dexChoice": "ERGODEX"
         },
         "dexSettings": {
             "ergodexSettings": {

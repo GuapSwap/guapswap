@@ -25,11 +25,12 @@ object GuapSwapApp extends CommandIOApp(
         // Load configuration settings from guapswap_config.json
         val configFilePath: String = GuapSwapUtils.GUAPSWAP_CONFIG_FILE_PATH
         val configLoadResult: Try[GuapSwapConfig] = GuapSwapConfig.load(configFilePath) 
+        
         // Check if config file was loaded properly
         if (configLoadResult.isSuccess) {
 
             // Print title
-            println(Console.RED + GuapSwapCli.title + Console.RESET)
+            println(Console.RED + GuapSwapCli.guapswapTitle + Console.RESET)
 
             // Print configuration load status
             println(Console.GREEN + "========== CONFIGURATIONS LOADED SUCCESSFULLY ==========" + Console.RESET)
@@ -57,7 +58,7 @@ object GuapSwapApp extends CommandIOApp(
                     // TODO: Add proxy script to guapswap_proxy.json
 
                     // Print out proxy address for user
-                    println(Console.BLUE + "========== INSERT GUAPSWAP PROXY ADDRESS BELOW INTO YOUR MINER ==========" + Console.RESET)
+                    println(Console.BLUE + "========== INSERT GUAPSWAP PROXY (P2S) ADDRESS BELOW INTO YOUR MINER ==========" + Console.RESET)
                     println(proxyScript)
 
                     // Return successful exit code
@@ -65,7 +66,23 @@ object GuapSwapApp extends CommandIOApp(
                 }
                 
                 case GuapSwapCli.Swap(proxyAddress, onetime) => {
-                    println(s"swapped: ${proxyAddress} with onetime=${onetime}")
+
+                    if (onetime) {
+
+                        // Print guapswap initiating status message
+                        println(Console.YELLOW + "========== GUAPSWAP ONETIME BEING INITIATED ==========" + Console.RESET)
+                        val onetimeSwapTxLink: String = GuapSwapInteractions.guapswapOneTime(ergoClient, parameters, proxyAddress)
+
+                        // Print out guapswap initiated status message
+                        println(Console.GREEN + "========== GUAPSWAP ONETIME INITIATED ==========" + Console.RESET)
+                        
+                        // Print tx link to user
+                        println(Console.BLUE + "========== VIEW GUAPSWAP ONETIME TX IN THE ERGO-EXPLORER WITH THE LINK BELOW ==========" + Console.RESET)
+                        println(onetimeSwapTxLink)
+                        
+                    } else {
+                        // TODO: initiate indefinite swap
+                    }
                     
                     // Return successful exit code
                     IO(ExitCode.Success)
@@ -88,8 +105,13 @@ object GuapSwapApp extends CommandIOApp(
             } 
         } else {
 
-            // Print Failure exeption and return the error exit code
+            // Print configuration load status
+            println(Console.RED + "========== CONFIGURATIONS LOADED UNSUCCESSFULLY ==========" + Console.RESET)
+
+            // Print Failure exeption
             println(configLoadResult.get)
+
+            // Return error exit code
             Opts(IO(ExitCode.Error))
         }
 

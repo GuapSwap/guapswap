@@ -17,8 +17,6 @@ object GuapSwapErgoDexSwapSellProxyContract {
             // val GuapSwapProtocolFeePercentageNum: Long  
             // val GuapSwapProtocolFeePercentageDenom: Long
             // val GuapSwapProtocolFeeContract: Coll[Byte]
-            // val GuapSwapMinerFee: Long
-            // val MinErgoDexExecutionFee: Long
 
             // ====== ErgoDex Settings Variables ====== //
             // First column of indicies: Index of "getVar[T](tag: Int): Option[T]" corresponding to the appropriate ContextVariable.
@@ -32,22 +30,26 @@ object GuapSwapErgoDexSwapSellProxyContract {
             // 6  => MaxMinerFee: Long              => 22
             // 7  => PoolNFT: Coll[Byte]            => 8
             // 9  => NewPK: SigmaProp               => 0 (Includes the SigmaPropConstPrefixHex added to the original miner PK)
+            // 10 => GuapSwapMinerFee: Long
+            // 11 => MinErgoDexExecutionFee: Long
 
             // Assigning the corresponding ErgoDex variables their value from the transaction context.
-            val FeeNum: Long                = getVar[Long](0).get
-            val QuoteId: Coll[Byte]         = getVar[Coll[Byte]](1).get
-            val MinQuoteAmount: Long        = getVar[Long](2).get
-            val BaseAmount: Long            = getVar[Long](3).get
-            val DexFeePerTokenNum: Long     = getVar[Long](4).get
-            val DexFeePerTokenDenom: Long   = getVar[Long](5).get
-            val MaxMinerFee: Long           = getVar[Long](6).get
-            val PoolNFT: Coll[Byte]         = getVar[Coll[Byte]](7).get
-            val NewPK: SigmaProp            = getVar[SigmaProp](9).get
+            val FeeNum:                 Long        =   getVar[Long](0).get
+            val QuoteId:                Coll[Byte]  =   getVar[Coll[Byte]](1).get
+            val MinQuoteAmount:         Long        =   getVar[Long](2).get
+            val BaseAmount:             Long        =   getVar[Long](3).get
+            val DexFeePerTokenNum:      Long        =   getVar[Long](4).get
+            val DexFeePerTokenDenom:    Long        =   getVar[Long](5).get
+            val MaxMinerFee:            Long        =   getVar[Long](6).get
+            val PoolNFT:                Coll[Byte]  =   getVar[Coll[Byte]](7).get
+            val NewPK:                  SigmaProp   =   getVar[SigmaProp](9).get
+            val GuapSwapMinerFee:       Long        =   getVar[Long](10).get
+            val MinErgoDexExecutionFee: Long        =   getVar[Long](11).get
 
             // Replacing the ErgoDex variable values in the SwapSell template with their corresponding value from the transaction context.
-            val positions_Long: Coll[Int] = Coll(2, 10, 11, 12, 14, 17, 18, 22)
-            val positions_Coll_Byte: Coll[Int] = Coll(8, 9)
-            val positions_SigmaProp: Coll[Int] = Coll(0)
+            val positions_Long:         Coll[Int]  =    Coll(2, 10, 11, 12, 14, 17, 18, 22)
+            val positions_Coll_Byte:    Coll[Int]  =    Coll(8, 9)
+            val positions_SigmaProp:    Coll[Int]  =    Coll(0)
 
             val newValues_Long: Coll[Long] = Coll(
                 BaseAmount,
@@ -60,7 +62,7 @@ object GuapSwapErgoDexSwapSellProxyContract {
                 MaxMinerFee
             )
 
-            val newValues_Coll_Byte: Coll[Coll[Bytes]] = Coll(
+            val newValues_Coll_Byte: Coll[Coll[Byte]] = Coll(
                 PoolNFT,
                 QuoteId
             )
@@ -69,30 +71,11 @@ object GuapSwapErgoDexSwapSellProxyContract {
                 NewPK
             )
 
-            // Alternatively
-            // val positions: Coll[Int] = Coll(0, 2, 8, 9, 10, 11, 12, 14, 17, 18, 22)
-
-            // val newValues: Coll[Any] = Coll(
-            //     NewPK,
-            //     BaseAmount,
-            //     PoolNFT,
-            //     QuoteId,
-            //     MinQuoteAmount,
-            //     DexFeePerTokenNum,
-            //     DexFeePerTokenDenom,
-            //     FeeNum,
-            //     BaseAmount,
-            //     FeeNum,
-            //     MaxMinerFee
-            // )
-
             // Will insert new values based on the following order: Long => Coll[Byte] => SigmaProp
-            val newErgoDexSwapSellContractSample_Long: Coll[Byte] = substConstants(ErgoDexSwapSellContractSample, positions_Long, newValues_Long)
+            val newErgoDexSwapSellContractSample_Long:      Coll[Byte] = substConstants(ErgoDexSwapSellContractSample, positions_Long, newValues_Long)
             val newErgoDexSwapSellContractSample_Coll_Byte: Coll[Byte] = substConstants(newErgoDexSwapSellContractSample_Long, positions_Coll_Byte, newValues_Coll_Byte)
             val newErgoDexSwapSellContractSample_SigmaProp: Coll[Byte] = substConstants(newErgoDexSwapSellContractSample_Coll_Byte, positions_SigmaProp, newValues_SigmaProp)
-            val newErgoDexSwapSellContractSample: Coll[Byte] = newErgoDexSwapSellContractSample_SigmaProp
-
-            // val newErgoDexSwapSellContractSample: Coll[Byte] = substConstants(ErgoDexSwapSellContractSample, positions, newValues)
+            val newErgoDexSwapSellContractSample:           Coll[Byte] = newErgoDexSwapSellContractSample_SigmaProp
 
             // ====== GuapSwap ErgoDex SwapSell Proxy Contract Conditions ====== //
             // Check that a valid ErgoDex SwapSell Box is an output.
