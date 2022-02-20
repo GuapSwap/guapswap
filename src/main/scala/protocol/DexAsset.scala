@@ -3,8 +3,8 @@ package protocol
 /**
   * Class to represent a dex asset.
   *
-  * @param ticker
   * @param id
+  * @param ticker
   * @param decimals
   */
 case class DexAsset(

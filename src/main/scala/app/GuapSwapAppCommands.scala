@@ -7,21 +7,21 @@ import com.monovore.decline.effect._
 
 import scala.collection.JavaConverters._
 
-import org.ergoplatform.appkit.{JavaHelpers, Address, ErgoClient, BlockchainContext, ConstantsBuilder, ErgoContract, ErgoValue, Iso, InputBox}
+import org.ergoplatform.{Pay2SAddress, P2PKAddress, ErgoBox}
+import org.ergoplatform.appkit._
 import configs.node.GuapSwapNodeConfig
 import configs.parameters.GuapSwapParameters
 import protocol.GuapSwapUtils
-import dex.ergodex.{ErgoDexUtils, ErgoDexSwap, ErgoDexSwapSellParams}
 import contracts.{GuapSwapErgoDexSwapSellProxyContract, GuapSwapServiceFeeContract}
-import sigmastate.Values._
+import dex.ergodex.{ErgoDexUtils, ErgoDexSwap, ErgoDexSwapSellParams}
+import sigmastate.{Values, SType}
+import sigmastate.Values.EvaluatedValue
 import sigmastate.serialization.ErgoTreeSerializer
+import sigmastate.interpreter.ContextExtension
+import sigmastate.utxo.Deserialize
 import special.collection.Coll
 import special.sigma.SigmaProp
-import org.ergoplatform.appkit.NetworkType
-import org.ergoplatform.restapi.client.ApiClient
-import org.ergoplatform.appkit.RestApiErgoClient
-import org.ergoplatform.appkit.impl.InputBoxImpl
-import dex.ergodex.ErgoDexSwapSellParams
+import java.{util => ju}
 
 /**
   * Object that defines the commands availble for the CLI interface and for interacting with the Ergo blockchain
@@ -130,7 +130,6 @@ object GuapSwapAppCommands {
 
             // Get the hard-coded constants for the proxy contract
             val userPublicKey:                  ErgoValue[SigmaProp]    =   ErgoValue.of(Address.create(parameters.guapswapProtocolSettings.userAddress).getPublicKey())
-            val swapSellContractSample:         ErgoValue[Coll[Byte]]   =   ErgoValue.of(JavaHelpers.decodeStringToBytes(ErgoDexUtils.ERGODEX_SWAPSELL_CONTRACT_SAMPLE))
             val protocolFeePercentageFraction:  (Long, Long)            =   GuapSwapUtils.calculateTotalProtocolFeePercentage(parameters.guapswapProtocolSettings.serviceFees.protocolFeePercentage, parameters.guapswapProtocolSettings.serviceFees.protocolUIFeePercentage)
             val protocolFeePercentageNum:       ErgoValue[Long]         =   ErgoValue.of(protocolFeePercentageFraction._1)
             val protocolFeePercentageDenom:     ErgoValue[Long]         =   ErgoValue.of(protocolFeePercentageFraction._2)
@@ -143,7 +142,6 @@ object GuapSwapAppCommands {
                 val ergocontract: ErgoContract = ctx.compileContract(
                     ConstantsBuilder.create()
                         .item("PK",                                 userPublicKey.getValue())
-                        .item("ErgoDexSwapSellContractSample",      swapSellContractSample.getValue())
                         .item("GuapSwapProtocolFeePercentageNum",   protocolFeePercentageNum.getValue())
                         .item("GuapSwapProtocolFeePercentageDenom", protocolFeePercentageDenom.getValue())
                         .item("GuapSwapProtocolFeeContract",        protocolFeeContract.getValue())
@@ -161,7 +159,7 @@ object GuapSwapAppCommands {
             
         }
 
-        def guapswapOneTime(ergoClient: ErgoClient, parameters: GuapSwapParameters, proxyAddress: String) = {
+        def guapswapOneTime(ergoClient: ErgoClient, nodeConfig: GuapSwapNodeConfig, parameters: GuapSwapParameters, proxyAddress: String): String = {
             
             // TODO: Check the parameters to make sure it corresponds to the appropriate DEX
             // Get the ergodex proxy script
@@ -169,7 +167,7 @@ object GuapSwapAppCommands {
 
             // Convert pool contract P2S address to an Address
             val poolContractAddress: Address = Address.create(ErgoDexUtils.ERGODEX_POOL_CONTRACT_ADDRESS)
-
+           
             // Convert proxy contract P2S address to an Address
             val proxyContractAddress: Address = Address.create(proxyAddress)
 
@@ -188,32 +186,95 @@ object GuapSwapAppCommands {
             val poolIdSearch: String = ErgoDexUtils.validErgoDexPools.get(poolSearchName).get.poolId
 
             // Generate blockchain context
-            val guapswapOneTimeTxId: String = ergoClient.execute((ctx: BlockchainContext) => {
+            val guapswapOneTimeTx: String = ergoClient.execute((ctx: BlockchainContext) => {
 
-                // Search for the pool box based on the pool Id
+                // Search for the pool box based on the pool Id => THERE SHOULD ONLY BE ONE SUCH BOX
                 val poolBoxes: List[InputBox] = ctx.getUnspentBoxesFor(poolContractAddress, 0, 20).asScala.toList
                 val poolBox: InputBox = poolBoxes.filter(poolbox => poolbox.getTokens().get(0).getId().toString.equals(poolIdSearch))(0)
                 
                 // Search for all the proxy boxes => assumes a max payout of 1/hr for one week
                 val proxyBoxes: List[InputBox] = ctx.getUnspentBoxesFor(proxyContractAddress, 0, 168).asScala.toList
-                
-                // Generate the swap sell parameters
-                val swapSellParams:         ErgoDexSwapSellParams   = ErgoDexSwapSellParams.swapSellParams(parameters, poolBox, proxyBoxes)
-                val protocolMinerFee:       ErgoValue[Long]         = ErgoValue.of(GuapSwapUtils.convertMinerFee(parameters.guapswapProtocolSettings.serviceFees.protocolMinerFee))
-                val minErgoDexExecutionFee: ErgoValue[Long]         = ErgoValue.of(ErgoDexUtils.calculateMinExecutionFee(GuapSwapUtils.convertMinerFee(parameters.dexSettings.ergodexSettings.ergodexMinerFee)))
+                val totalPayout: Long = proxyBoxes.foldLeft(0L)((acc, proxybox) => acc + proxybox.getValue())
 
-                // Insert swap parameters into contract and substitute the constants
-                val substSwapSellContractSample: ErgoValue[Coll[Byte]] = ErgoDexSwapSellParams.getSubstSwapSellContractWithParams(swapSellParams)
+                // Generate the swap sell parameters
+                val swapSellParams: ErgoDexSwapSellParams = ErgoDexSwapSellParams.swapSellParams(parameters, poolBox, proxyBoxes)
+
+                // Get protocol fee contract
+                val protocolFeeContract: String = Address.create(GuapSwapUtils.GUAPSWAP_PROTOCOL_FEE_CONTRACT_SAMPLE).asP2PK().toString() // TODO: Change this to a P2S with proper protocol fee contract
+                val protocolFee: Long = GuapSwapUtils.calculateTotalProtocolFee(parameters.guapswapProtocolSettings.serviceFees.protocolFeePercentage, parameters.guapswapProtocolSettings.serviceFees.protocolUIFeePercentage, totalPayout)
                 
+                // Get context variables
+                val newSwapSellContractSample:  ErgoValue[Coll[Byte]]   = ErgoDexSwapSellParams.getSubstSwapSellContractWithParams(swapSellParams)
+                val swapBoxContract:            String                  = Address.fromErgoTree(ErgoTreeSerializer.DefaultSerializer.deserializeErgoTree(newSwapSellContractSample.getValue().toArray), ctx.getNetworkType()).asP2S().toString()
+                val protocolMinerFee:           ErgoValue[Long]         = ErgoValue.of(GuapSwapUtils.convertMinerFee(parameters.guapswapProtocolSettings.serviceFees.protocolMinerFee))
+                val dexMinerFee:                Long                    = GuapSwapUtils.convertMinerFee(parameters.dexSettings.ergodexSettings.ergodexMinerFee)
+                val minValueOfTotalErgoDexFees: ErgoValue[Long]         = ErgoValue.of(ErgoDexUtils.minValueOfTotalErgoDexFees(ErgoDexUtils.calculateMinExecutionFee(dexMinerFee), dexMinerFee))
+                val serviceFee:                 Long                    = GuapSwapUtils.calculateServiceFee(protocolFee, protocolMinerFee.getValue())
+                val swapBoxValue:               Long                    = totalPayout - serviceFee
+
+                // Create requried Map for context variables
+                val contextVarMap: Map[Byte, EvaluatedValue[_ <: SType]] = Map(
+                    0.toByte -> Iso.isoErgoValueToSValue.to(newSwapSellContractSample),
+                    1.toByte -> Iso.isoErgoValueToSValue.to(protocolMinerFee),
+                    2.toByte -> Iso.isoErgoValueToSValue.to(minValueOfTotalErgoDexFees),
+                    3.toByte -> Iso.isoErgoValueToSValue.to(ErgoValue.of(totalPayout))
+                )
+
+                // Create ContextExension variables
+                val contextExtensionVariables: ContextExtension = ContextExtension.apply(contextVarMap)
+
+                // Create input boxs with context variables
+                val extendedInputBoxes: List[ExtendedInputBox] = proxyBoxes.map(proxybox => getExtendedInputBox(proxybox, contextExtensionVariables))
+
+                // Create tx builder
+                val txBuilder: UnsignedTransactionBuilder = ctx.newTxBuilder();
                 
+                // Create output swap box
+                val swapBox: OutBox = txBuilder.outBoxBuilder()
+                    .value(swapBoxValue)
+                    .contract(ctx.compileContract(
+                        ConstantsBuilder.empty(),
+                        swapBoxContract
+                    ))
+                    .build();
                 
-                
-                ""
+                // Create output protocol fee box
+                val protocolFeeBox: OutBox = txBuilder.outBoxBuilder()
+                    .value(protocolFee)
+                    .contract(ctx.compileContract(
+                        ConstantsBuilder.empty(),
+                        protocolFeeContract
+                    ))
+                    .build();
+
+                // Create prover
+                val prover: ErgoProver = ctx.newProverBuilder()
+                    .withMnemonic(
+                        SecretString.create(nodeConfig.wallet.mnemonic),
+                        SecretString.create(nodeConfig.wallet.password)
+                    )
+                    .build();
+
+                // Create unsigned transaction
+                val unsignedGuapSwapTx: UnsignedTransaction = txBuilder.boxesToSpend(extendedInputBoxes.asInstanceOf[ju.List[InputBox]])
+                    .outputs(swapBox, protocolFeeBox)
+                    .fee(protocolMinerFee.getValue())
+                    .build();
+
+                // Sign transaction
+                val signedGuapSwapTx: SignedTransaction = prover.sign(unsignedGuapSwapTx)
+                val guapswapTxId: String = ctx.sendTransaction(signedGuapSwapTx)
+                signedGuapSwapTx.toJson(true)
+
             })
 
-
-            ""
+            guapswapOneTimeTx
         }
+
+        private def getExtendedInputBox(proxyBox: InputBox, contextExtensionVariables: ContextExtension): ExtendedInputBox = {
+            ExtendedInputBox(proxyBox.asInstanceOf[ErgoBox], contextExtensionVariables)
+        }
+
     }
 
 }

@@ -70,15 +70,16 @@ object GuapSwapApp extends CommandIOApp(
                     if (onetime) {
 
                         // Print guapswap initiating status message
-                        println(Console.YELLOW + "========== GUAPSWAP ONETIME BEING INITIATED ==========" + Console.RESET)
-                        val onetimeSwapTxLink: String = GuapSwapInteractions.guapswapOneTime(ergoClient, parameters, proxyAddress)
+                        println(Console.YELLOW + "========== GUAPSWAP ONETIME INITIATED ==========" + Console.RESET)
+                        val onetimeSwapTx: String = GuapSwapInteractions.guapswapOneTime(ergoClient, nodeConfig, parameters, proxyAddress)
 
+                        // TODO: check if tx is even possible
                         // Print out guapswap initiated status message
-                        println(Console.GREEN + "========== GUAPSWAP ONETIME INITIATED ==========" + Console.RESET)
+                        println(Console.GREEN + "========== GUAPSWAP ONETIME SUCCEEDED ==========" + Console.RESET)
                         
                         // Print tx link to user
                         println(Console.BLUE + "========== VIEW GUAPSWAP ONETIME TX IN THE ERGO-EXPLORER WITH THE LINK BELOW ==========" + Console.RESET)
-                        println(onetimeSwapTxLink)
+                        println(onetimeSwapTx)
                         
                     } else {
                         // TODO: initiate indefinite swap

@@ -1,5 +1,7 @@
 package configs.node
 
+import org.ergoplatform.appkit.SecretString
+
 /**
   * Class to represent the wallet configuration.
   *

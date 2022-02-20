@@ -11,7 +11,7 @@ import dex.ergodex.ErgoDexUtils
   * @param minerFee
   */
 case class GuapSwapErgoDexSettings(
-    val swapAssetTicker: String,
+    val swapAssetTicker: String = "SigUSD",
     val slippageTolerancePercentage: Double = ErgoDexUtils.DEFAULT_ERGODEX_SLIPPAGE_TOLERANCE_PERCENTAGE,
     val nitro: Double = ErgoDexUtils.DEFAULT_ERGODEX_NITRO,
     val ergodexMinerFee: Double = ErgoDexUtils.DEFAULT_ERGODEX_MINER_FEE

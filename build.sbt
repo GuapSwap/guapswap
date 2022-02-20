@@ -18,12 +18,6 @@ lazy val root = project
     "org.typelevel" %% "cats-kernel" % VersionScheme.Always
     ),
 
-    resolvers ++= Seq(
-      "SonaType" at "https://oss.sonatype.org/content/groups/public",
-      "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases/",
-      "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
-    ),
-
     assembly / assemblyJarName := s"guapswap-${version.value}.jar",
     assembly / assemblyOutputPath := file(s"./guapswap-${version.value}.jar/")
 

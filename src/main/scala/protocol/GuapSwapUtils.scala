@@ -3,6 +3,8 @@ package protocol
 import org.ergoplatform.appkit.Address
 import scala.collection.immutable.HashMap
 import spire.syntax.fractional
+import shapeless.ops.product
+import java.util.IllegalFormatException
 
 /**
   * Object representing constants and methods relevant to GuapSwap.
@@ -48,7 +50,11 @@ object GuapSwapUtils {
       * @param erg
       * @return Converted ERG value in nanoErgs.
       */
-    def ergToNanoErg(erg: Double): Long = (erg * 1000000000L).toLong
+    def ergToNanoErg(erg: Double): Long = {
+      val fraction: (Long, Long) = decimalToFraction(erg)
+      val nanoergs: Long = (fraction._1 * 1000000000L) / fraction._2
+      nanoergs
+    }
 
     /**
       * Calculate the miner fee in nanoERGs
@@ -58,6 +64,8 @@ object GuapSwapUtils {
       */
     def convertMinerFee(minerFee: Double): Long = {
       val minerFeeNanoErgs = ergToNanoErg(minerFee)
+      
+      // Force miner fee to be > minimum box value required by Ergo blockchain.
       if (minerFeeNanoErgs < MIN_BOX_VALUE) {
           ergToNanoErg(DEFAULT_PROTOCOL_MINER_FEE)
       } else {
@@ -86,7 +94,7 @@ object GuapSwapUtils {
       * @param payout
       * @return Total protocol fee in nanoErgs.
       */
-    def calculateTotalProtocolFee(protocolFeePercentage: Double, protocolUIFeePercentage: Double, payout: Long): Long = ergToNanoErg(protocolFeePercentage * payout) + ergToNanoErg(protocolUIFeePercentage * payout)
+    def calculateTotalProtocolFee(protocolFeePercentage: Double, protocolUIFeePercentage: Double, payout: Long): Long = ((protocolFeePercentage + protocolUIFeePercentage) * payout.toDouble).toLong
 
     /**
       * Calculate the service fee, this include the total protocol fee and the protocol miner fee
@@ -110,8 +118,8 @@ object GuapSwapUtils {
     /**
       * Method to calculate the base amount to be swapped at the dex.
       *
-      * @param payout
-      * @param totalFee
+      * @param payout Amount received from mining pool as reward
+      * @param totalFee Total fees charged on payout.
       * @return Base amount to be swapped in nanoErgs.
       */
     def calculateBaseAmount(payout: Long, totalFee: Long): Long = payout - totalFee
@@ -123,17 +131,22 @@ object GuapSwapUtils {
       * @return Tuple of the numerator and denominator representing the decimal number.
       */
     def decimalToFraction(number: Double): (Long, Long) = {
+      
+      // Format the number correctly for calculation such that there are no trailing zeros. 
       val bigdecimalNumber: BigDecimal = BigDecimal.apply(number).underlying().stripTrailingZeros()
-      val listMatch: List[String] = bigdecimalNumber.toString.split("\\.").toList
+      val bigdecimalToDouble: Double = bigdecimalNumber.doubleValue()
+      val listMatch: List[String] = bigdecimalToDouble.toString.split("\\.").toList
+      
+      // Get the fractional representation of the decimal number
       val fractionTuple: (Long, Long) = listMatch match {
         case List(whole, fractional) => {
-          val numDecimals = fractional.length()
-          val denominator = Math.pow(10, numDecimals).toLong
-          val numerator = whole.toLong * denominator + fractional.toLong
+          val numDecimals: Double = fractional.length().toDouble
+          val denominator: Long = Math.pow(10D, numDecimals).toLong
+          val numerator: Long = whole.toLong * denominator + fractional.toLong
           (numerator, denominator)
         }
-        case _ => (number.toLong, number.toLong)
       }
+
       fractionTuple
     }
     

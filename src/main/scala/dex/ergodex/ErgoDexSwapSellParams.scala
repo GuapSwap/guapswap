@@ -1,6 +1,6 @@
 package dex.ergodex
 
-import org.ergoplatform.appkit.{ErgoValue, InputBox, ErgoToken, Address, JavaHelpers}
+import org.ergoplatform.appkit.{ErgoValue, InputBox, ErgoToken, Address, JavaHelpers, Iso}
 import special.collection.Coll
 import special.sigma.SigmaProp
 import configs.parameters.GuapSwapParameters
@@ -9,6 +9,7 @@ import configs.parameters.dex_settings.GuapSwapErgoDexSettings
 import protocol.GuapSwapUtils
 import sigmastate.serialization.ErgoTreeSerializer
 import sigmastate.{SType, Values}
+import org.ergoplatform.validation.{SigmaValidationSettings, ValidationRules}
 
 /**
   * Class representing the parameters to be provided to the ErgoDexSwapSell contract.
@@ -55,18 +56,18 @@ object ErgoDexSwapSellParams {
     val yAsset: ErgoToken = poolBox.getTokens().get(2)
 
     // PoolFeeNum: Long => R4 value of poolBox
-    val poolFeeNum: Long = poolBox.getRegisters().get(0).getValue().asInstanceOf[Long]
+    val poolFeeNum: Long = poolBox.getRegisters().get(0).getValue().toString().toLong
 
     // xAmount of ERG and yAmount of token in LP
     val xAmount: Long = poolBox.getValue()
     val yAmount: Long = yAsset.getValue()
 
-    // Total payout value
-    val payout: Long = proxyBoxes.foldLeft(0L)((acc, proxybox) => acc + proxybox.getValue())
-
     // Get access to the parameter settings determined in the guapswap_config.json file
     val guapswapSettings: GuapSwapProtocolSettings = parameters.guapswapProtocolSettings
     val ergodexSettings: GuapSwapErgoDexSettings = parameters.dexSettings.ergodexSettings
+
+    // Calculate total payout
+    val payout: Long = proxyBoxes.foldLeft(0L)((acc, proxybox) => acc + proxybox.getValue())
         
     // Calculate the guapswap fees
     val guapswapTotalProtocolFee: Long = GuapSwapUtils.calculateTotalProtocolFee(guapswapSettings.serviceFees.protocolFeePercentage, guapswapSettings.serviceFees.protocolUIFeePercentage, payout)
@@ -94,17 +95,17 @@ object ErgoDexSwapSellParams {
     val dexFeePerTokenFraction: (Long, Long) = GuapSwapUtils.decimalToFraction(swapExtemums._1)
 
     // Calculate the new PK with the added hex prefix
-    val newPK: String = ErgoDexUtils.addPKAddressPrefix(guapswapSettings.userAddress)
+    //val newPK: String = ErgoDexUtils.addPKAddressPrefix(guapswapSettings.userAddress)
 
     // Converts all value types into ErgoValue types
-    val paramPK:                    ErgoValue[SigmaProp]    =   ErgoValue.of(Address.create(newPK).getPublicKey())
-    val paramPoolFeeNum:            ErgoValue[Long]         =   ErgoValue.of(poolFeeNum)
+    val paramPK:                    ErgoValue[SigmaProp]    =   ErgoValue.of(Address.create(guapswapSettings.userAddress).asP2PK().pubkey)
+    val paramPoolFeeNum:            ErgoValue[Long]          =   ErgoValue.of(poolFeeNum)
     val paramQuoteId:               ErgoValue[Coll[Byte]]   =   ErgoValue.of(yAsset.getId().getBytes())
-    val paramMinQuoteAmount:        ErgoValue[Long]         =   ErgoValue.of(minQuoteAmount)
-    val paramBaseAmount:            ErgoValue[Long]         =   ErgoValue.of(baseAmount)
-    val paramDexFeePerTokenNum:     ErgoValue[Long]         =   ErgoValue.of(dexFeePerTokenFraction._1)
-    val paramDexFeePerTokenDenom:   ErgoValue[Long]         =   ErgoValue.of(dexFeePerTokenFraction._2)
-    val paramMaxMinerFee:           ErgoValue[Long]         =   ErgoValue.of(ergodexMinerFee)
+    val paramMinQuoteAmount:        ErgoValue[Long]          =   ErgoValue.of(minQuoteAmount)
+    val paramBaseAmount:            ErgoValue[Long]          =   ErgoValue.of(baseAmount)
+    val paramDexFeePerTokenNum:     ErgoValue[Long]          =   ErgoValue.of(dexFeePerTokenFraction._1)
+    val paramDexFeePerTokenDenom:   ErgoValue[Long]          =   ErgoValue.of(dexFeePerTokenFraction._2)
+    val paramMaxMinerFee:           ErgoValue[Long]          =   ErgoValue.of(ergodexMinerFee)
     val paramPoolNFTId:             ErgoValue[Coll[Byte]]   =   ErgoValue.of(poolNFT.getId().getBytes())
 
     val swapsellparams = ErgoDexSwapSellParams(paramPK, paramPoolFeeNum, paramQuoteId, paramMinQuoteAmount, paramBaseAmount, paramDexFeePerTokenNum, paramDexFeePerTokenDenom, paramMaxMinerFee, paramPoolNFTId)
@@ -120,42 +121,42 @@ object ErgoDexSwapSellParams {
   def getSubstSwapSellContractWithParams(swapsellparams: ErgoDexSwapSellParams): ErgoValue[Coll[Byte]] = {
   
     // Get the ErgoTree bytes for the swap sell contract sample
-    val ErgoDexSwapSellContractSample: Array[Byte] = JavaHelpers.decodeStringToBytes(ErgoDexUtils.ERGODEX_SWAPSELL_CONTRACT_SAMPLE)
-    
+    val DexSwapSellContractSample: Array[Byte] = JavaHelpers.decodeStringToBytes(ErgoDexUtils.ERGODEX_SWAPSELL_CONTRACT_SAMPLE)
+
     // Define the position arrays for the different constant locations
     val positions_Long:      Array[Int] = Array(2, 10, 11, 12, 14, 17, 18, 22)
     val positions_Coll_Byte: Array[Int] = Array(8, 9)
     val positions_SigmaProp: Array[Int] = Array(0)
 
     // Define the values arrays for the different SType constants
-    val newValues_Long: Array[Values.Value[Long]] = Array(
-      swapsellparams.paramBaseAmount.getValue(),
-      swapsellparams.paramMinQuoteAmount.getValue(),
-      swapsellparams.paramDexFeePerTokenNum.getValue(),
-      swapsellparams.paramDexFeePerTokenDenom.getValue(),
-      swapsellparams.paramFeeNum.getValue(),
-      swapsellparams.paramBaseAmount.getValue(),
-      swapsellparams.paramFeeNum.getValue(),
-      swapsellparams.paramMaxMinerFee.getValue()
-    ).asInstanceOf[Array[Values.Value[Long]]]
+    val newValues_Long: Array[Values.Value[SType]] = Array(
+      Iso.isoErgoValueToSValue.to(swapsellparams.paramBaseAmount),
+      Iso.isoErgoValueToSValue.to(swapsellparams.paramMinQuoteAmount),
+      Iso.isoErgoValueToSValue.to(swapsellparams.paramDexFeePerTokenNum),
+      Iso.isoErgoValueToSValue.to(swapsellparams.paramDexFeePerTokenDenom),
+      Iso.isoErgoValueToSValue.to(ErgoValue.of(swapsellparams.paramFeeNum.getValue().toInt)),
+      Iso.isoErgoValueToSValue.to(swapsellparams.paramBaseAmount),
+      Iso.isoErgoValueToSValue.to(ErgoValue.of(swapsellparams.paramFeeNum.getValue().toInt)),
+      Iso.isoErgoValueToSValue.to(swapsellparams.paramMaxMinerFee)
+    )
 
-    val newValues_Coll_Byte: Array[Values.Value[Array[Byte]]] = Array(
-      swapsellparams.paramPoolNFTId.getValue(),
-      swapsellparams.paramQuoteId.getValue()
-    ).asInstanceOf[Array[Values.Value[Array[Byte]]]]
+    val newValues_Coll_Byte: Array[Values.Value[SType]] = Array(
+      Iso.isoErgoValueToSValue.to(swapsellparams.paramPoolNFTId),
+      Iso.isoErgoValueToSValue.to(swapsellparams.paramQuoteId),
+    )
     
-    val newValues_SigmaProp: Array[Values.Value[SigmaProp]] = Array(
-      swapsellparams.paramPK.getValue()
-    ).asInstanceOf[Array[Values.Value[SigmaProp]]]
-
+    val newValues_SigmaProp: Array[Values.Value[SType]] = Array(
+      Iso.isoErgoValueToSValue.to(swapsellparams.paramPK)
+    )
+    
     // Replace constants in the ErgoTree
-    val newErgoDexSwapSellContractSample_Long:      Array[Byte] = ErgoTreeSerializer.DefaultSerializer.substituteConstants(ErgoDexSwapSellContractSample, positions_Long, newValues_Long)
-    val newErgoDexSwapSellContractSample_Coll_Byte: Array[Byte] = ErgoTreeSerializer.DefaultSerializer.substituteConstants(newErgoDexSwapSellContractSample_Long, positions_Coll_Byte, newValues_Coll_Byte)
-    val newErgoDexSwapSellContractSample_SigmaProp: Array[Byte] = ErgoTreeSerializer.DefaultSerializer.substituteConstants(newErgoDexSwapSellContractSample_Coll_Byte, positions_SigmaProp, newValues_SigmaProp)
+    implicit val settings: SigmaValidationSettings = ValidationRules.currentSettings
+    val newErgoDexSwapSellContractSample_Long:      Array[Byte] = ErgoTreeSerializer.DefaultSerializer.substituteConstants(DexSwapSellContractSample, positions_Long, newValues_Long)._1
+    val newErgoDexSwapSellContractSample_Coll_Byte: Array[Byte] = ErgoTreeSerializer.DefaultSerializer.substituteConstants(newErgoDexSwapSellContractSample_Long, positions_Coll_Byte, newValues_Coll_Byte)._1
+    val newErgoDexSwapSellContractSample_SigmaProp: Array[Byte] = ErgoTreeSerializer.DefaultSerializer.substituteConstants(newErgoDexSwapSellContractSample_Coll_Byte, positions_SigmaProp, newValues_SigmaProp)._1
     val newErgoDexSwapSellContractSample:           Array[Byte] = newErgoDexSwapSellContractSample_SigmaProp
     
     ErgoValue.of(newErgoDexSwapSellContractSample)
   }
-
 
 }
