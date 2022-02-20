@@ -26,7 +26,7 @@ object GuapSwapErgoDexSwapSellProxyContract {
 
             // ====== GuapSwap ErgoDex SwapSell Proxy Contract Conditions ====== //
             // Some useful calculations
-            val totalPayout:    Long = INPUTS.fold(0L, {(acc:Long, input:Box) => acc + input.value})
+            val totalPayout:    Long = INPUTS.fold(0L, {(acc: Long, input: Box) => acc + input.value})
             val protocolFee:    Long = (GuapSwapProtocolFeePercentageNum * totalPayout) / GuapSwapProtocolFeePercentageDenom
             val serviceFee:     Long = protocolFee + GuapSwapMinerFee
             val totalFees:      Long = serviceFee + TotalDexFee

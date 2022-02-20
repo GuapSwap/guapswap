@@ -3,7 +3,7 @@ package dex.ergodex
 import org.ergoplatform.appkit.{ErgoValue, InputBox, ErgoToken, Address, JavaHelpers, Iso}
 import org.ergoplatform.validation.{SigmaValidationSettings, ValidationRules}
 
-import special.collection.Coll
+import special.collection.{Coll, Colls}
 import special.sigma.SigmaProp
 
 import configs.parameters.GuapSwapParameters
@@ -17,8 +17,7 @@ import sigmastate.utxo.Deserialize
 import sigmastate.serialization.ErgoTreeSerializer
 import org.ergoplatform.appkit.Constants
 import sigmastate.interpreter.ErgoTreeEvaluator
-
-
+import org.ergoplatform.appkit.ErgoType
 
 /**
   * Class representing the parameters to be provided to the ErgoDexSwapSell contract.
@@ -110,13 +109,13 @@ object ErgoDexSwapSellParams {
     // Converts all value types into ErgoValue types
     val paramPK:                    ErgoValue[SigmaProp]    =   ErgoValue.of(newPK)
     val paramPoolFeeNum:            ErgoValue[Int]          =   ErgoValue.of(poolFeeNum)
-    val paramQuoteId:               ErgoValue[Coll[Byte]]   =   ErgoValue.of(yAsset.getId().getBytes())
-    val paramMinQuoteAmount:        ErgoValue[Long]          =   ErgoValue.of(minQuoteAmount)
-    val paramBaseAmount:            ErgoValue[Long]          =   ErgoValue.of(baseAmount)
-    val paramDexFeePerTokenNum:     ErgoValue[Long]          =   ErgoValue.of(dexFeePerTokenFraction._1)
-    val paramDexFeePerTokenDenom:   ErgoValue[Long]          =   ErgoValue.of(dexFeePerTokenFraction._2)
-    val paramMaxMinerFee:           ErgoValue[Long]          =   ErgoValue.of(ergodexMinerFee)
-    val paramPoolNFTId:             ErgoValue[Coll[Byte]]   =   ErgoValue.of(poolNFT.getId().getBytes())
+    val paramQuoteId:               ErgoValue[Coll[Byte]]   =   ErgoValue.of(JavaHelpers.collFrom(yAsset.getId().getBytes()), ErgoType.byteType())
+    val paramMinQuoteAmount:        ErgoValue[Long]         =   ErgoValue.of(minQuoteAmount)
+    val paramBaseAmount:            ErgoValue[Long]         =   ErgoValue.of(baseAmount)
+    val paramDexFeePerTokenNum:     ErgoValue[Long]         =   ErgoValue.of(dexFeePerTokenFraction._1)
+    val paramDexFeePerTokenDenom:   ErgoValue[Long]         =   ErgoValue.of(dexFeePerTokenFraction._2)
+    val paramMaxMinerFee:           ErgoValue[Long]         =   ErgoValue.of(ergodexMinerFee)
+    val paramPoolNFTId:             ErgoValue[Coll[Byte]]   =   ErgoValue.of(JavaHelpers.collFrom(poolNFT.getId().getBytes()), ErgoType.byteType())
 
     val swapsellparams = ErgoDexSwapSellParams(paramPK, paramPoolFeeNum, paramQuoteId, paramMinQuoteAmount, paramBaseAmount, paramDexFeePerTokenNum, paramDexFeePerTokenDenom, paramMaxMinerFee, paramPoolNFTId)
     swapsellparams
@@ -184,7 +183,7 @@ object ErgoDexSwapSellParams {
     // val newDexSwapSellContractSample_SigmaProp: Array[Byte] = ErgoTreeSerializer.DefaultSerializer.substituteConstants(newDexSwapSellContractSample_Coll_Byte, positions_SigmaProp, newValues_SigmaProp)._1
     // val newDexSwapSellContractSample:           Array[Byte] = newDexSwapSellContractSample_SigmaProp
 
-    ErgoValue.of(ErgoTree.fromProposition(newDexSwapSellContractSample.asInstanceOf[Values.SigmaPropValue]).bytes)
+    ErgoValue.of(JavaHelpers.collFrom(ErgoTree.fromProposition(newDexSwapSellContractSample.asInstanceOf[Values.SigmaPropValue]).bytes), ErgoType.byteType())
   }
 
 }
