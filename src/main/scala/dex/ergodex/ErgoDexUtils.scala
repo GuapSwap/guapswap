@@ -4,6 +4,7 @@ import protocol.{DexPool, DexAsset, GuapSwapUtils}
 import scala.collection.immutable.HashMap
 import org.ergoplatform.ErgoBox
 import org.ergoplatform.appkit.Address
+import org.ergoplatform.P2PKAddress
 
 /**
   * Object representing constants and methods relevant to ErgoDex.
@@ -88,8 +89,9 @@ object ErgoDexUtils {
       * @return The user Pk address with the hex prefix.
       */
     def addPKAddressPrefix(pk: String): String = {
-        val bytes: String = Address.create(pk).asP2PK().contentBytes.toString()
-        val pkWithPrefix: String = SIGMAPROP_CONST_PREFIX_HEX + bytes
+        val key = Address.create(pk).asP2PK()
+        val keySliceBytes: Array[Byte] = key.contentBytes.slice(1, 34)
+        val pkWithPrefix: String = SIGMAPROP_CONST_PREFIX_HEX + keySliceBytes.toString()
         pkWithPrefix
     }
     

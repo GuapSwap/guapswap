@@ -23,21 +23,19 @@ object GuapSwapErgoDexSwapSellProxyContract {
             val NewDexSwapSellContractSample:   Coll[Byte]  = getVar[Coll[Byte]](0).get 
             val GuapSwapMinerFee:               Long        = getVar[Long](1).get                      
             val TotalDexFee:                    Long        = getVar[Long](2).get
-            val TotalPayout:                    Long        = getVar[Long](3).get
 
             // ====== GuapSwap ErgoDex SwapSell Proxy Contract Conditions ====== //
             // Some useful calculations
-            // TODO: Use INPUTS and calculate TotalPayout within contract, having trouble with map and fold functions
-            val protocolFee:    Long = ((GuapSwapProtocolFeePercentageNum * TotalPayout) / GuapSwapProtocolFeePercentageDenom)
+            val totalPayout:    Long = INPUTS.fold(0L, {(acc:Long, input:Box) => acc + input.value})
+            val protocolFee:    Long = (GuapSwapProtocolFeePercentageNum * totalPayout) / GuapSwapProtocolFeePercentageDenom
             val serviceFee:     Long = protocolFee + GuapSwapMinerFee
             val totalFees:      Long = serviceFee + TotalDexFee
-            val baseAmount:     Long = TotalPayout - totalFees
             
             // Check that a valid Dex Swap Sell Box in an output.
             val validDexSwapBox = {
                 val userSwapBox: Box = OUTPUTS(0)
                 SELF.value >= totalFees &&
-                userSwapBox.value >= TotalPayout - serviceFee && 
+                userSwapBox.value >= totalPayout - serviceFee && 
                 userSwapBox.propositionBytes == NewDexSwapSellContractSample
             }
 
@@ -51,7 +49,7 @@ object GuapSwapErgoDexSwapSellProxyContract {
             // Check that a valid Refund Box is an output if initiated by user.
             val validRefundBox = {
                 val refundBox: Box = OUTPUTS(0)
-                refundBox.value >= TotalPayout - serviceFee &&
+                refundBox.value >= totalPayout - serviceFee &&
                 refundBox.propositionBytes == PK.propBytes
             }
 

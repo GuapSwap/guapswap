@@ -32,10 +32,17 @@ object ErgoDexSwap {
       * @param feeDenom
       * @return Minimum output token amount from ErgoDex LP for given input amount.
       */
-    def calculateMinOutputAmount(swapInputAmount: Long, maxSlippagePercentage: Double, xAmount: Long, yAmount: Long, feeNum: Long, feeDenom: Long): Long = {
-        val slippage: Long = (maxSlippagePercentage * 100).toLong
-        val outputAmount: Long = yAmount * swapInputAmount * feeNum / ((xAmount + (xAmount * slippage) / (100L * 100L)) * feeDenom + swapInputAmount * feeNum)
-        outputAmount
+    def calculateMinOutputAmount(baseAmount: Long, maxSlippagePercentage: Double, xAssetAmount: Long, yAssetAmount: Long, feeNumerator: Long, feeDenominator: Long): Long = {
+        val swapInputAmount:  BigInt = BigInt.apply(baseAmount)
+        val xAmount:          BigInt = BigInt.apply(xAssetAmount)
+        val yAmount:          BigInt = BigInt.apply(yAssetAmount)
+        val feeNum:           BigInt = BigInt.apply(feeNumerator)
+        val feeDenom:   BigInt = BigInt.apply(feeDenominator)
+
+        val slippage: BigInt = BigInt.apply((maxSlippagePercentage * 100).toInt)
+        val outputAmount: BigInt = (yAmount * swapInputAmount * feeNum) / ((xAmount + (xAmount * slippage) / (BigInt.apply(100) * BigInt.apply(100))) * feeDenom + swapInputAmount * feeNum)
+        val outputAmountLong: Long = outputAmount.toLong
+        outputAmountLong
     }
 
     /**
@@ -47,10 +54,10 @@ object ErgoDexSwap {
       * @return Tuple containing the swam extremums.
       */
     def swapExtremums(minExecutionFee: Long, nitro: Double, minOutputAmount: Long): (Long, (Long, Long, Long, Long)) = {
-        val exFeePerToken = minExecutionFee / minOutputAmount 
-        val adjustedMinExecutionFee = Math.floor(exFeePerToken * minOutputAmount)
-        val maxExecutionFee = Math.floor(minExecutionFee * nitro)
-        val maxOutputAmount = Math.floor(maxExecutionFee / exFeePerToken)
+        val exFeePerToken: Long = minExecutionFee / minOutputAmount 
+        val adjustedMinExecutionFee: Double = Math.floor(exFeePerToken * minOutputAmount)
+        val maxExecutionFee: Double = Math.floor(minExecutionFee * nitro)
+        val maxOutputAmount: Double = Math.floor(maxExecutionFee / exFeePerToken)
         val extremums = (exFeePerToken, (adjustedMinExecutionFee.toLong, maxExecutionFee.toLong, minOutputAmount, maxOutputAmount.toLong))
         extremums
     }
