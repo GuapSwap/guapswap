@@ -57,14 +57,14 @@ object GuapSwapErgoDexSwapSellProxyContract {
             val validGuapSwap = {
                 validDexSwapBox &&
                 validGuapSwapProtocolFeeBox &&
-                OUTPUTS.size == 3
+                OUTPUTS.size == 4 // swapbox, feebox, changebox, minerbox
             }
 
             // For a valid refund to occur, the following conditions must be met.
             val validRefund = {
                 validRefundBox &&
                 validGuapSwapProtocolFeeBox &&
-                OUTPUTS.size == 3
+                OUTPUTS.size == 4 // swapbox, feebox, changebox, minerbox
             }
 
             // One of these three conditions must be met in order to validate the script and execute the transaction with the corresponding action.

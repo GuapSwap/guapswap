@@ -28,6 +28,7 @@ import org.ergoplatform.ErgoBoxCandidate
 import org.ergoplatform.wallet.boxes.ErgoBoxSerializer
 import org.ergoplatform.appkit.impl.ErgoTreeContract
 import org.ergoplatform.appkit.impl.ErgoScriptContract
+import org.ergoplatform.wallet.mnemonic
 
 /**
   * Object that defines the commands availble for the CLI interface and for interacting with the Ergo blockchain
@@ -207,7 +208,7 @@ object GuapSwapAppCommands {
 
                 // Get protocol fee contract
                 val protocolFeeContractAddress: ErgoAddress = Address.create(GuapSwapUtils.GUAPSWAP_PROTOCOL_FEE_CONTRACT_SAMPLE).asP2PK() // TODO: Change this to a P2S with proper protocol fee contract
-                val protocolFeeContract: ErgoTree = Address.create(GuapSwapUtils.GUAPSWAP_PROTOCOL_FEE_CONTRACT_SAMPLE).asP2PK().script
+                val protocolFeeContract: ErgoTree = protocolFeeContractAddress.script
                 val protocolFee: Long = GuapSwapUtils.calculateTotalProtocolFee(parameters.guapswapProtocolSettings.serviceFees.protocolFeePercentage, parameters.guapswapProtocolSettings.serviceFees.protocolUIFeePercentage, totalPayout)
                 
                 // Get context variables
@@ -243,11 +244,27 @@ object GuapSwapAppCommands {
                     .contract(ctx.newContract(protocolFeeContract))
                     .build();
 
-                // Create prover
+                // Create temp prover
+                val userMnemonicSecretString: SecretString = SecretString.create(nodeConfig.wallet.mnemonic)
+                val userAddress: Address = Address.create(parameters.guapswapProtocolSettings.userAddress)
+                
+                // val tempProver: ErgoProver = ctx.newProverBuilder()
+                //     .withMnemonic(
+                //         userMnemonicSecretString,
+                //         SecretString.empty()
+                //     )
+                //     .withEip3Secret(0)
+                //     .build();
+
+                // Find EIP3 index using temporary prover
+                // val userEIP3Addresses: ju.List[Address] = tempProver.getEip3Addresses()
+                // val userEIP3Index: Int = userEIP3Addresses.indexOf(userAddress)
+
+                // Create real prover with EIP3 index
                 val prover: ErgoProver = ctx.newProverBuilder()
                     .withMnemonic(
-                        SecretString.create(nodeConfig.wallet.mnemonic),
-                        SecretString.create(nodeConfig.wallet.password)
+                        userMnemonicSecretString,
+                        SecretString.empty()
                     )
                     .build();
 

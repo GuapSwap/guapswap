@@ -183,6 +183,7 @@ object ErgoDexSwapSellParams {
     // val newDexSwapSellContractSample_SigmaProp: Array[Byte] = ErgoTreeSerializer.DefaultSerializer.substituteConstants(newDexSwapSellContractSample_Coll_Byte, positions_SigmaProp, newValues_SigmaProp)._1
     // val newDexSwapSellContractSample:           Array[Byte] = newDexSwapSellContractSample_SigmaProp
 
+    //val nc = ErgoTree.fromProposition(newDexSwapSellContractSample.asInstanceOf[Values.SigmaPropValue]).constants
     ErgoValue.of(JavaHelpers.collFrom(ErgoTree.fromProposition(newDexSwapSellContractSample.asInstanceOf[Values.SigmaPropValue]).bytes), ErgoType.byteType())
   }
 

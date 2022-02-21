@@ -18,7 +18,6 @@ object GuapSwapApp extends CommandIOApp(
     version = "0.1.0"
 ) {
 
-
     override def main: Opts[IO[ExitCode]] = {
     
 
