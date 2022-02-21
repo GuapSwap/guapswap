@@ -224,7 +224,7 @@ object GuapSwapAppCommands {
                 var cVar1: ContextVar = ContextVar.of[Coll[Byte]](0, newSwapSellContractSample)
                 var cVar2: ContextVar = ContextVar.of[Long](1, protocolMinerFee)
                 var cVar3: ContextVar = ContextVar.of[Long](2, minValueOfTotalErgoDexFees)
-
+                println("vars: " + cVar1.getValue.getValue + " " + cVar2.getValue.getValue + " " + cVar3.getValue.getValue)
                 // Create input boxs with context variables
                 val extendedProxyInputBoxes: List[InputBox] = proxyBoxes.map(proxybox => proxybox.withContextVars(cVar1, cVar2, cVar3))
                 val extendedInputs: ju.List[InputBox] = seqAsJavaList(extendedProxyInputBoxes)
@@ -237,35 +237,25 @@ object GuapSwapAppCommands {
                     .value(swapBoxValue)
                     .contract(ctx.newContract(swapBoxContract))
                     .build();
-                
+                println("swapBoxValue: " + swapBoxValue)
                 // Create output protocol fee box
                 val protocolFeeBox: OutBox = txBuilder.outBoxBuilder()
                     .value(protocolFee)
                     .contract(ctx.newContract(protocolFeeContract))
                     .build();
-
-                // Create temp prover
-                val userMnemonicSecretString: SecretString = SecretString.create(nodeConfig.wallet.mnemonic)
-                val userAddress: Address = Address.create(parameters.guapswapProtocolSettings.userAddress)
-                
-                // val tempProver: ErgoProver = ctx.newProverBuilder()
-                //     .withMnemonic(
-                //         userMnemonicSecretString,
-                //         SecretString.empty()
-                //     )
-                //     .withEip3Secret(0)
-                //     .build();
-
-                // Find EIP3 index using temporary prover
-                // val userEIP3Addresses: ju.List[Address] = tempProver.getEip3Addresses()
-                // val userEIP3Index: Int = userEIP3Addresses.indexOf(userAddress)
-
-                // Create real prover with EIP3 index
+                println("protocolFee: " + protocolFee)
+                // Create prover
                 val prover: ErgoProver = ctx.newProverBuilder()
                     .withMnemonic(
-                        userMnemonicSecretString,
+                        SecretString.create(nodeConfig.wallet.mnemonic),
                         SecretString.empty()
                     )
+                    .withEip3Secret(0)
+                    .withEip3Secret(1)
+                    .withEip3Secret(2)
+                    .withEip3Secret(3)
+                    .withEip3Secret(4)
+                    .withEip3Secret(5)
                     .build();
 
                 // Create unsigned transaction

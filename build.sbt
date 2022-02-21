@@ -5,11 +5,11 @@ lazy val root = project
 
     version := "0.1.0",
 
-    scalaVersion := "2.12.10",
+    scalaVersion := "2.12.15",
 
     libraryDependencies ++= Seq(
       "org.scalatest" %% "scalatest" % "3.2.9" % Test,
-      "org.ergoplatform" %% "ergo-appkit" % "4.0.6",
+      "org.ergoplatform" %% "ergo-appkit" % "4.0.7",
       "com.google.code.gson" % "gson" % "2.8.5",
       "com.monovore" %% "decline-effect" % "2.2.0"
     ),

@@ -34,41 +34,33 @@ object GuapSwapErgoDexSwapSellProxyContract {
             // Check that a valid Dex Swap Sell Box in an output.
             val validDexSwapBox = {
                 val userSwapBox: Box = OUTPUTS(0)
-                SELF.value >= totalFees &&
-                userSwapBox.value >= totalPayout - serviceFee && 
-                userSwapBox.propositionBytes == NewDexSwapSellContractSample
+                (SELF.value >= totalFees) && (userSwapBox.value >= totalPayout - TotalDexFee) && (userSwapBox.propositionBytes == NewDexSwapSellContractSample)
             }
 
             // Check that a valid GuapSwap Protocol Fee Box is an output.
             val validGuapSwapProtocolFeeBox = {
                 val protocolFeeBox: Box = OUTPUTS(1)
-                protocolFeeBox.value >= protocolFee &&
-                protocolFeeBox.propositionBytes == GuapSwapProtocolFeeContract
+                (protocolFeeBox.value >= protocolFee) && (protocolFeeBox.propositionBytes == GuapSwapProtocolFeeContract)
             }
 
-            // Check that a valid Refund Box is an output if initiated by user.
+            // Check that a valid Refund Box is an output if initiated by user, can be spent in any way.
             val validRefundBox = {
                 val refundBox: Box = OUTPUTS(0)
-                refundBox.value >= totalPayout - serviceFee &&
-                refundBox.propositionBytes == PK.propBytes
+                (refundBox.value >= totalPayout) && (refundBox.propositionBytes == PK.propBytes)
             }
 
             // For a valid swap to occur, the following conditions must be met.
             val validGuapSwap = {
-                validDexSwapBox &&
-                validGuapSwapProtocolFeeBox &&
-                OUTPUTS.size == 4 // swapbox, feebox, changebox, minerbox
+                validDexSwapBox && validGuapSwapProtocolFeeBox && (OUTPUTS.size == 3) // swapbox, feebox, minerbox (entire box is spent, so no changebox is created)
             }
 
             // For a valid refund to occur, the following conditions must be met.
             val validRefund = {
-                validRefundBox &&
-                validGuapSwapProtocolFeeBox &&
-                OUTPUTS.size == 4 // swapbox, feebox, changebox, minerbox
+                validRefundBox 
             }
 
             // One of these three conditions must be met in order to validate the script and execute the transaction with the corresponding action.
-            sigmaProp(validGuapSwap || validRefund || PK)
+            sigmaProp(validGuapSwap || validRefund)
         }
         """.stripMargin
         script
