@@ -39,7 +39,7 @@ object ErgoDexSwap {
         val feeNum:           BigInt = BigInt.apply(feeNumerator)
         val feeDenom:   BigInt = BigInt.apply(feeDenominator)
 
-        val slippage: BigInt = BigInt.apply((maxSlippagePercentage * 100).toInt)
+        val slippage: BigInt = BigInt.apply((maxSlippagePercentage * 100D).toInt)
         val outputAmount: BigInt = (yAmount * swapInputAmount * feeNum) / ((xAmount + (xAmount * slippage) / (BigInt.apply(100) * BigInt.apply(100))) * feeDenom + swapInputAmount * feeNum)
         val outputAmountLong: Long = outputAmount.toLong
         outputAmountLong

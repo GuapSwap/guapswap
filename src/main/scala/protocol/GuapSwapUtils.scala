@@ -1,154 +1,351 @@
 package protocol
 
-import org.ergoplatform.appkit.Address
+import org.ergoplatform.appkit.{Parameters, SecretStorage, Mnemonic, SecretString, BlockchainContext, ErgoContract}
 import scala.collection.immutable.HashMap
-import spire.syntax.fractional
-import shapeless.ops.product
-import java.util.IllegalFormatException
+import scala.util.{Try, Success, Failure}
+import java.io.{File, FileNotFoundException}
+import configs.parameters.GuapSwapParameters
+import configs.parameters.protocol_settings.GuapSwapProtocolSettings
+import configs.parameters.dex_settings.GuapSwapDexSettings
+import org.ergoplatform.appkit.Address
+import org.ergoplatform.ErgoAddress
+import org.ergoplatform.appkit.ErgoValue
+import org.ergoplatform.appkit.ConstantsBuilder
+import special.sigma.SigmaProp
+import contracts.{GuapSwapDexSwapSellProxyContract, GuapSwapProtocolFeeContract}
+import special.collection.Coll
+import org.ergoplatform.appkit.JavaHelpers
+import org.ergoplatform.appkit.ErgoType
 
 /**
   * Object representing constants and methods relevant to GuapSwap.
   */
 object GuapSwapUtils {
 
-    // Constant representing the storage location within the project repository of the guapswap_config.json file and guapswap_proxy.json file
-    final val GUAPSWAP_CONFIG_FILE_PATH: String = "storage/guapswap_config.json"
-    final val GUAPSWAP_PROXY_FILE_PATH: String = "storage/guapswap_proxy.json"
+  // Constant representing the storage location within the project repository of the guapswap_config.json file and guapswap_proxy.json file
+  final val GUAPSWAP_CONFIG_FILE_PATH: String = "storage/guapswap_config.json"
+  final val GUAPSWAP_PROXY_FILE_PATH: String = "storage/guapswap_proxy.json"
 
-    // Default public node URL
-    final val DEFAULT_API_URL: String = "http://213.239.193.208:9053/"
+  // Default public node URL
+  final val DEFAULT_API_URL: String = "http://213.239.193.208:9053/"
 
-    // Default GetBlok TESTNET node URL
-    final val DEFAULT_GETBLOK_TESTNET_API_URL: String = "http://ergo-testnet.getblok.io:3056"
+  // Default GetBlok TESTNET node URL
+  final val DEFAULT_GETBLOK_TESTNET_API_URL: String = "http://ergo-testnet.getblok.io:3056"
 
-    // Default service fee constants
-    final val DEFAULT_PROTOCOL_FEE_PERCENTAGE: Double = 0.0025D // 0.0 for GuapSwap-Ronin CLI only
-    final val DEFAULT_PROTOCOL_UI_FEE_PERCENTAGE: Double = 0.0D // 0.0 for all CLI versions, only charged for web version with UI.
-    final val DEFAULT_PROTOCOL_MINER_FEE: Double = 0.002D
+  // Default secret storage directory
+  final val DEFAULT_SECRET_STORAGE_DIRECTORY: String = "storage/.secretStorage"
 
-    // GuapSwap service fee contract sample P2S address, for now just my TESTNET test_wallet P2PK address
-    final val GUAPSWAP_PROTOCOL_FEE_CONTRACT_SAMPLE: String = "9ej8AEGCpNxPaqfgisJTU2RmYG91bWfK1hu2xT34i5Xdw4czidX"
+  // Default protocol fee constants
+  final val DEFAULT_PROTOCOL_FEE_PERCENTAGE: Double = 0.0025D // 0.0 for GuapSwap-Ronin CLI only
+  final val DEFAULT_PROTOCOL_UI_FEE_PERCENTAGE: Double = 0.0D // 0.0 for all CLI versions, only charged for web version with UI.
+  final val DEFAULT_PROTOCOL_MINER_FEE: Double = 0.002D
 
-    // Minimum box value in nanoErgs
-    final val MIN_BOX_VALUE: Long = 1000000L
+  // Founder PKs
+  final val JESPER_PK: String = "9fSek6bWQ2yusFHyJARD95KPTCrn5rfEav6msGZpxQZQvcBADQ9"
+  final val GEORGE_PK: String = "9fSek6bWQ2yusFHyJARD95KPTCrn5rfEav6msGZpxQZQvcBADQ9"
+  final val LUCA_PK: String = "9fSek6bWQ2yusFHyJARD95KPTCrn5rfEav6msGZpxQZQvcBADQ9"
 
-    // HashMap of possible Ergo Assets
-    final val validErgoAssets: HashMap[String, DexAsset] = HashMap(
-      "ERG"     -> DexAsset("0", "ERG", 9),
-      "SigUSD"  -> DexAsset("03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04", "SigUSD", 2),
-      "SigRSV"  -> DexAsset("003bd19d0187117f130b62e1bcab0939929ff5c7709f843c5c4dd158949285d0", "SigRSV", 0),
-      "Erdoge"  -> DexAsset("36aba4b4a97b65be491cf9f5ca57b5408b0da8d0194f30ec8330d1e8946161c1", "Erdoge", 0),
-      "LunaDog" -> DexAsset("5a34d53ca483924b9a6aa0c771f11888881b516a8d1a9cdc535d063fe26d065e", "LunaDog", 8),
-      "kushti"  -> DexAsset("fbbaac7337d051c10fc3da0ccb864f4d32d40027551e1c3ea3ce361f39b91e40", "kushti", 0),
-      "WT_ERG"  -> DexAsset("ef802b475c06189fdbf844153cdc1d449a5ba87cce13d11bb47b5a539f27f12b", "WT_ERG", 9),
-      "WT_ADA"  -> DexAsset("30974274078845f263b4f21787e33cc99e9ec19a17ad85a5bc6da2cca91c5a2e", "WT_ADA", 8)
-    )
+  // Fee box threshold
+  final val THRESHOLD: Long = Parameters.OneErg
 
-    /**
-      * Convert from ERGs to nanoERGs
-      *
-      * @param erg
-      * @return Converted ERG value in nanoErgs.
-      */
-    def ergToNanoErg(erg: Double): Long = {
-      val fraction: (Long, Long) = decimalToFraction(erg)
-      val nanoergs: Long = (fraction._1 * 1000000000L) / fraction._2
-      nanoergs
+  // Fee split
+  final val FEE_SPLIT: Double = 0.333
+  final val FEE_SPLIT_FRACTION: (Long, Long) = decimalToFraction(0.333)
+  final val FEE_SPLIT_NUM: Long = FEE_SPLIT_FRACTION._1
+  final val FEE_SPLIT_DENOM: Long = FEE_SPLIT_FRACTION._2
+
+  // HashMap of possible Ergo Assets
+  final val validErgoAssets: HashMap[String, DexAsset] = HashMap(
+    "ERG"     -> DexAsset("0", "ERG", 9),
+    "SigUSD"  -> DexAsset("03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04", "SigUSD", 2),
+    "SigRSV"  -> DexAsset("003bd19d0187117f130b62e1bcab0939929ff5c7709f843c5c4dd158949285d0", "SigRSV", 0),
+    "Erdoge"  -> DexAsset("36aba4b4a97b65be491cf9f5ca57b5408b0da8d0194f30ec8330d1e8946161c1", "Erdoge", 0),
+    "LunaDog" -> DexAsset("5a34d53ca483924b9a6aa0c771f11888881b516a8d1a9cdc535d063fe26d065e", "LunaDog", 8),
+    "kushti"  -> DexAsset("fbbaac7337d051c10fc3da0ccb864f4d32d40027551e1c3ea3ce361f39b91e40", "kushti", 0),
+    "WT_ERG"  -> DexAsset("ef802b475c06189fdbf844153cdc1d449a5ba87cce13d11bb47b5a539f27f12b", "WT_ERG", 9),
+    "WT_ADA"  -> DexAsset("30974274078845f263b4f21787e33cc99e9ec19a17ad85a5bc6da2cca91c5a2e", "WT_ADA", 8)
+  )
+
+  /**
+    * Convert from ERGs to nanoERGs
+    *
+    * @param erg
+    * @return Converted ERG value in nanoErgs.
+    */
+  def ergToNanoErg(erg: Double): Long = {
+    val fraction: (Long, Long) = decimalToFraction(erg)
+    val nanoergs: Long = (fraction._1 * Parameters.OneErg) / fraction._2
+    nanoergs
+  }
+
+  /**
+    * Calculate the miner fee in nanoERGs
+    *
+    * @param minerFee
+    * @return Miner fee in nanoERGs.
+    */
+  def convertMinerFee(minerFee: Double): Long = {
+    val minerFeeNanoErgs = ergToNanoErg(minerFee)
+    
+    // Force miner fee to be > minimum box value required by Ergo blockchain.
+    if (minerFeeNanoErgs < Parameters.MinFee) {
+        ergToNanoErg(DEFAULT_PROTOCOL_MINER_FEE)
+    } else {
+        minerFeeNanoErgs
+    }
+  }
+
+  /**
+    * Calculate the total protocol fee percentage. 
+    *
+    * @param protocolFeePercentage
+    * @param protocolUIFeePercentage
+    * @return The numerator and denominator of the total protocol fee percentage
+    */
+  def calculateTotalProtocolFeePercentage(protocolFeePercentage: Double, protocolUIFeePercentage: Double): (Long, Long) = {
+    val percentageSum: Double = protocolFeePercentage + protocolUIFeePercentage
+    val fraction: (Long, Long) = decimalToFraction(percentageSum)
+    fraction
+  }
+
+  /**
+    * Calculate the total protocol fees, this include the ui fee and the procotol fee, but NOT the protocol miner fee
+    *
+    * @param protocolFee
+    * @param protocolUIFee
+    * @param payout
+    * @return Total protocol fee in nanoErgs.
+    */
+  def calculateTotalProtocolFee(protocolFeePercentage: Double, protocolUIFeePercentage: Double, payout: Long): Long = ((protocolFeePercentage + protocolUIFeePercentage) * payout.toDouble).toLong
+
+  /**
+    * Calculate the service fee, this include the total protocol fee and the protocol miner fee
+    *
+    * @param totalProtocolFee
+    * @param protocolMinerFee
+    * @return Total service fee in nanoErgs.
+    */
+  def calculateServiceFee(totolProtocolFee: Long, protocolMinerFee: Long): Long = totolProtocolFee + protocolMinerFee
+
+  /**
+    * Method to calculate the minValue for the Guap Swap transaction to occur, including interaction with the dex.
+    * 
+    * @param serviceFee
+    * @param totalDexFee The minium total fees charged by the dex, including mining fees at that stage.
+    * @return The minimum value in nanoErgs that the transaction can cost, on both the GuapSwap stage and dex stage.
+    */
+  def minValueOfTotalFees(serviceFee: Long, totalDexFee: Long): Long = serviceFee + totalDexFee
+
+
+  /**
+    * Method to calculate the base amount to be swapped at the dex.
+    *
+    * @param payout Amount received from mining pool as reward
+    * @param totalFee Total fees charged on payout.
+    * @return Base amount to be swapped in nanoErgs.
+    */
+  def calculateBaseAmount(payout: Long, totalFee: Long): Long = payout - totalFee
+  
+  /**
+    * Method to convert a decimal number to a rational fraction.
+    *
+    * @param number
+    * @return Tuple of the numerator and denominator representing the decimal number.
+    */
+  def decimalToFraction(number: Double): (Long, Long) = {
+    
+    // Format the number correctly for calculation such that there are no trailing zeros. 
+    val bigdecimalNumber: BigDecimal = BigDecimal.apply(number).underlying().stripTrailingZeros()
+    val bigdecimalToDouble: Double = bigdecimalNumber.doubleValue()
+    val listMatch: List[String] = bigdecimalToDouble.toString.split("\\.").toList
+    
+    // Get the fractional representation of the decimal number
+    val fractionTuple: (Long, Long) = listMatch match {
+      case List(whole, fractional) => {
+        val numDecimals: Double = fractional.length().toDouble
+        val denominator: Long = Math.pow(10D, numDecimals).toLong
+        val numerator: Long = whole.toLong * denominator + fractional.toLong
+        (numerator, denominator)
+      }
     }
 
-    /**
-      * Calculate the miner fee in nanoERGs
-      *
-      * @param minerFee
-      * @return Miner fee in nanoERGs.
-      */
-    def convertMinerFee(minerFee: Double): Long = {
-      val minerFeeNanoErgs = ergToNanoErg(minerFee)
-      
-      // Force miner fee to be > minimum box value required by Ergo blockchain.
-      if (minerFeeNanoErgs < MIN_BOX_VALUE) {
-          ergToNanoErg(DEFAULT_PROTOCOL_MINER_FEE)
+    fractionTuple
+  }
+
+  /**
+    * Load secret storage
+    * 
+    * @return A Try[SecretStorage] statement containing the secret storage or the exception to handle.
+    */
+  def loadSecretStorage(): Try[SecretStorage] = Try {
+   
+    println(Console.YELLOW + "========== LOADING SECRET STORAGE ==========" + Console.RESET)
+  
+    var secretFile: File = new File(DEFAULT_SECRET_STORAGE_DIRECTORY)
+    
+    // Check if directory exists
+    if (secretFile.isDirectory()) {
+
+      // List files in the directory
+      val files: Array[File] = secretFile.listFiles()
+
+      // Check if there are files that exist in the directory
+      if (files.length == 0) {
+        throw new FileNotFoundException
       } else {
-          minerFeeNanoErgs
+        secretFile = files(0)
+        SecretStorage.loadFrom(secretFile)
+      }
+
+    } else {
+      throw new FileNotFoundException
+    }
+    
+  }
+
+  /**
+    * Generate secret storage
+    *
+    * @return The generated secret storage
+    */
+  def generateSecretStorage(): SecretStorage = {
+    println(Console.YELLOW + "========== GENERATING SECRET STORAGE ==========" + Console.RESET)
+    println(Console.YELLOW + "========== PLEASE ENTER A PASSWORD FOR SECRET STORAGE ==========" + Console.RESET)
+    val password: String = System.console().readPassword().mkString
+    
+    val mnemonicPhrase: Array[Char] = Mnemonic.generateEnglishMnemonic().toCharArray()
+    val mnemonic: Mnemonic = Mnemonic.create(SecretString.create(mnemonicPhrase), SecretString.empty())
+    val generatedSecretStorage: SecretStorage = SecretStorage.createFromMnemonicIn(DEFAULT_SECRET_STORAGE_DIRECTORY, mnemonic, password)
+    
+    println(Console.GREEN + "========== SECRET STORAGE CREATED ==========" + Console.RESET)
+    println(Console.BLUE + "========== YOUR MNEMONIC AND SECRET STORAGE ARE THE FOLLOWING ==========" + Console.RESET)
+    println("Mnemonic Phrase: " + mnemonic.getPhrase().toStringUnsecure())
+    println("SecretStorage Directory: " + generatedSecretStorage.getFile().getPath())
+    
+    generatedSecretStorage
+  
+  }
+
+  /**
+    * Unlock the locked secret storage.
+    *
+    * @param lockedSecretStorage
+    * @return Unlocked secret storage.
+    */
+  def unlockSecretStorage(lockedSecretStorage: SecretStorage): Try[SecretStorage] = Try {
+    println(Console.YELLOW + "===== PLEASE ENTER YOUR ENCRYPTION PASSWORD TO UNLOCK SECRET STORAGE" + Console.RESET)
+    val passPhrase: String = System.console().readPassword().mkString
+    
+    // Unlock secret storage
+    println(Console.YELLOW + "========== UNLOCKING SECRET STORAGE ==========")
+    try {
+        lockedSecretStorage.unlock(passPhrase)
+    } catch {
+        case exception: RuntimeException => {
+            println(Console.RED + "========== WRONG PASSWORD ==========" + Console.RESET)
+            throw exception
+        }                   
+    }
+    println(Console.GREEN + "========== SECRET STORAGE UNLOCKED ==========")
+    lockedSecretStorage
+  }
+
+  /**
+    * Check secret storage
+    *
+    * @return The loaded or generated secret storage
+    */
+  def checkSecretStorage(): SecretStorage = {
+    
+    // Check and load secret storage
+    val checkSecretStorage: SecretStorage = GuapSwapUtils.loadSecretStorage() match {
+        
+      case Success(loadedSecretStorage) => {
+        println(Console.GREEN + "========== SECRET STORAGE EXISTS ==========" + Console.RESET)
+        loadedSecretStorage
+      }
+
+      case Failure(exception) => {
+          println(Console.RED + "========== SECRET STORAGE DOES NOT EXISTS ==========" + Console.RESET)
+          
+          // Generate secret storage
+          val generatedSecretStorage: SecretStorage = generateSecretStorage()
+          generatedSecretStorage
       }
     }
 
-    /**
-      * Calculate the total protocol fee percentage. 
-      *
-      * @param protocolFeePercentage
-      * @param protocolUIFeePercentage
-      * @return The numerator and denominator of the total protocol fee percentage
-      */
-    def calculateTotalProtocolFeePercentage(protocolFeePercentage: Double, protocolUIFeePercentage: Double): (Long, Long) = {
-      val percentageSum: Double = protocolFeePercentage + protocolUIFeePercentage
-      val fraction: (Long, Long) = decimalToFraction(percentageSum)
-      fraction
-    }
+    checkSecretStorage
+  }
 
-    /**
-      * Calculate the total protocol fees, this include the ui fee and the procotol fee, but NOT the protocol miner fee
-      *
-      * @param protocolFee
-      * @param protocolUIFee
-      * @param payout
-      * @return Total protocol fee in nanoErgs.
-      */
-    def calculateTotalProtocolFee(protocolFeePercentage: Double, protocolUIFeePercentage: Double, payout: Long): Long = ((protocolFeePercentage + protocolUIFeePercentage) * payout.toDouble).toLong
+  /**
+    * Get the compiled ErgoContract of the dex swap sell proxy script.
+    *
+    * @param ctx
+    * @param parameters
+    * @param dexSwapSellContractSample
+    * @return Compiled ErgoContract of dex swap sell contract sample.
+    */
+  def getDexSwapSellProxyErgoContract(ctx: BlockchainContext, parameters: GuapSwapParameters, dexSwapSellContractSampleScript: String): ErgoContract = {
 
-    /**
-      * Calculate the service fee, this include the total protocol fee and the protocol miner fee
-      *
-      * @param totalProtocolFee
-      * @param protocolMinerFee
-      * @return Total service fee in nanoErgs.
-      */
-    def calculateServiceFee(totolProtocolFee: Long, protocolMinerFee: Long): Long = totolProtocolFee + protocolMinerFee
+    // Get the proxy contract ErgoScript
+    val dexSwapSellProxyScript: String = GuapSwapDexSwapSellProxyContract.getScript
 
-    /**
-      * Method to calculate the minValue for the Guap Swap transaction to occur, including interaction with the dex.
-      * 
-      * @param serviceFee
-      * @param totalDexFee The minium total fees charged by the dex, including mining fees at that stage.
-      * @return The minimum value in nanoErgs that the transaction can cost, on both the GuapSwap stage and dex stage.
-      */
-    def minValueOfTotalFees(serviceFee: Long, totalDexFee: Long): Long = serviceFee + totalDexFee
-
-
-    /**
-      * Method to calculate the base amount to be swapped at the dex.
-      *
-      * @param payout Amount received from mining pool as reward
-      * @param totalFee Total fees charged on payout.
-      * @return Base amount to be swapped in nanoErgs.
-      */
-    def calculateBaseAmount(payout: Long, totalFee: Long): Long = payout - totalFee
+    // Get the hard-coded constants for the proxy contract
+    val userPublicKey:                  ErgoValue[SigmaProp]    =   ErgoValue.of(Address.create(parameters.guapswapProtocolSettings.userAddress).getPublicKey())
+    val protocolFeePercentageFraction:  (Long, Long)            =   GuapSwapUtils.calculateTotalProtocolFeePercentage(parameters.guapswapProtocolSettings.serviceFees.protocolFeePercentage, parameters.guapswapProtocolSettings.serviceFees.protocolUIFeePercentage)
+    val protocolFeePercentageNum:       ErgoValue[Long]         =   ErgoValue.of(protocolFeePercentageFraction._1)
+    val protocolFeePercentageDenom:     ErgoValue[Long]         =   ErgoValue.of(protocolFeePercentageFraction._2)
+    val protocolFeeContract:            ErgoValue[Coll[Byte]]   =   ErgoValue.of(JavaHelpers.collFrom(getProtocolFeeErgoContract(ctx, parameters).getErgoTree().bytes), ErgoType.byteType())
+    val dexSwapSellContractSample:      ErgoValue[Coll[Byte]]   =   ErgoValue.of(JavaHelpers.decodeStringToColl(dexSwapSellContractSampleScript), ErgoType.byteType())
     
-    /**
-      * Method to convert a decimal number to a rational fraction.
-      *
-      * @param number
-      * @return Tuple of the numerator and denominator representing the decimal number.
-      */
-    def decimalToFraction(number: Double): (Long, Long) = {
-      
-      // Format the number correctly for calculation such that there are no trailing zeros. 
-      val bigdecimalNumber: BigDecimal = BigDecimal.apply(number).underlying().stripTrailingZeros()
-      val bigdecimalToDouble: Double = bigdecimalNumber.doubleValue()
-      val listMatch: List[String] = bigdecimalToDouble.toString.split("\\.").toList
-      
-      // Get the fractional representation of the decimal number
-      val fractionTuple: (Long, Long) = listMatch match {
-        case List(whole, fractional) => {
-          val numDecimals: Double = fractional.length().toDouble
-          val denominator: Long = Math.pow(10D, numDecimals).toLong
-          val numerator: Long = whole.toLong * denominator + fractional.toLong
-          (numerator, denominator)
-        }
-      }
+    // Compile the script into an ErgoContract
+    val dexSwapSellErgoContract: ErgoContract = ctx.compileContract(
+      ConstantsBuilder.create()
+        .item("UserPK",                             userPublicKey.getValue())
+        .item("GuapSwapProtocolFeePercentageNum",   protocolFeePercentageNum.getValue())
+        .item("GuapSwapProtocolFeePercentageDenom", protocolFeePercentageDenom.getValue())
+        .item("GuapSwapProtocolFeeContract",        protocolFeeContract.getValue())
+        .item("DexSwapSellContractSample",          dexSwapSellContractSample.getValue())
+        .build(),
+        dexSwapSellProxyScript
+    )
+    dexSwapSellErgoContract
 
-      fractionTuple
-    }
+  }
+
+  /**
+    * Get the compiled ErgoContract of the protocol fee address.
+    *
+    * @param ctx
+    * @param parameters
+    * @return Compiled ErgoContract of protocol fee contract.
+    */
+  def getProtocolFeeErgoContract(ctx: BlockchainContext, parameters: GuapSwapParameters): ErgoContract = {
     
+    // Protocol fee contract hard-coded constants  
+    val protocolFeeContractScript:      String                  =   GuapSwapProtocolFeeContract.getScript
+    val jesperPK:                       ErgoValue[SigmaProp]    =   ErgoValue.of(Address.create(GuapSwapUtils.JESPER_PK).getPublicKey())
+    val georgePK:                       ErgoValue[SigmaProp]    =   ErgoValue.of(Address.create(GuapSwapUtils.GEORGE_PK).getPublicKey())
+    val lucaPK:                         ErgoValue[SigmaProp]    =   ErgoValue.of(Address.create(GuapSwapUtils.LUCA_PK).getPublicKey())
+    val threshold:                      ErgoValue[Long]         =   ErgoValue.of(GuapSwapUtils.THRESHOLD)
+    val feeSplitNum:                    ErgoValue[Long]         =   ErgoValue.of(GuapSwapUtils.FEE_SPLIT_NUM)
+    val feeSplitDenom:                  ErgoValue[Long]         =   ErgoValue.of(GuapSwapUtils.FEE_SPLIT_DENOM)
+    val GuapSwapMinerFee:               ErgoValue[Long]         =   ErgoValue.of(GuapSwapUtils.convertMinerFee(parameters.guapswapProtocolSettings.serviceFees.protocolMinerFee))
+
+    // Protocol fee contract compiled ErgoContract
+    val protocolFeeErgoContract: ErgoContract = ctx.compileContract(
+        ConstantsBuilder.create()
+            .item("JesperPK", jesperPK.getValue())
+            .item("GeorgePK", georgePK.getValue())
+            .item("LucaPK", lucaPK.getValue())
+            .item("THRESHOLD", threshold.getValue())
+            .item("FeeSplitNum", feeSplitNum.getValue())
+            .item("FeeSplitDenom", feeSplitDenom.getValue())
+            .item("GuapSwapMinerFee", GuapSwapMinerFee.getValue())
+            .build(),
+            protocolFeeContractScript
+    )
+    protocolFeeErgoContract
+  }
     
 }

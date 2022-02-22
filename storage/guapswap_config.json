@@ -5,7 +5,7 @@
             "apiKey": ""
         },
         "wallet": {
-            "mnemonic": "pluck depth affair dinosaur inch moral vivid word tiger add latin maple measure exchange protect",
+            "mnemonic": "",
             "password": "",
             "mnemonicPassword": ""
         },
@@ -17,16 +17,16 @@
             "serviceFees": {
                 "protocolFeePercentage": 0.0025,
                 "protocolUIFeePercentage": 0.0,
-                "protocolMinerFee": 0.002
+                "protocolMinerFee": 0.005
             },
             "dexChoice": "ERGODEX"
         },
         "dexSettings": {
             "ergodexSettings": {
-                "swapAssetTicker": "SigUSD",
+                "swapAssetTicker": "SigRSV",
                 "slippageTolerancePercentage": 3,
                 "nitro": 1.2,
-                "ergodexMinerFee": 0.002 
+                "ergodexMinerFee": 0.005 
             }
         }
     } 
