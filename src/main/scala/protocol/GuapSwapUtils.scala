@@ -25,6 +25,7 @@ object GuapSwapUtils {
   // Constant representing the storage location within the project repository of the guapswap_config.json file and guapswap_proxy.json file
   final val GUAPSWAP_CONFIG_FILE_PATH: String = "storage/guapswap_config.json"
   final val GUAPSWAP_PROXY_FILE_PATH: String = "storage/guapswap_proxy.json"
+  final val GUAPSWAP_SWAPS_FILE_PATH: String = "storage/guapswap_swaps.json"
 
   // Default public node URL
   final val DEFAULT_API_URL: String = "http://213.239.193.208:9053/"
@@ -41,8 +42,8 @@ object GuapSwapUtils {
   final val DEFAULT_PROTOCOL_MINER_FEE: Double = 0.002D
 
   // Founder PKs
-  final val JESPER_PK: String = "9fSek6bWQ2yusFHyJARD95KPTCrn5rfEav6msGZpxQZQvcBADQ9"
-  final val GEORGE_PK: String = "9fSek6bWQ2yusFHyJARD95KPTCrn5rfEav6msGZpxQZQvcBADQ9"
+  final val JESPER_PK: String = "9hy9jt1Vuq3fZr4rSYAUqo1r2dAJBBdazV6cL8FNuBQEvM6wXfR"
+  final val GEORGE_PK: String = "9hA5gTKrx1YsTDjYiSnYqsAWawMq1GbvaemobybpCZ8qyHFBXKF"
   final val LUCA_PK: String = "9fSek6bWQ2yusFHyJARD95KPTCrn5rfEav6msGZpxQZQvcBADQ9"
 
   // Fee box threshold
@@ -210,7 +211,7 @@ object GuapSwapUtils {
     */
   def generateSecretStorage(): SecretStorage = {
     println(Console.YELLOW + "========== GENERATING SECRET STORAGE ==========" + Console.RESET)
-    println(Console.YELLOW + "========== PLEASE ENTER A PASSWORD FOR SECRET STORAGE ==========" + Console.RESET)
+    println(Console.YELLOW + "========== PLEASE CREATE A PASSWORD FOR SECRET STORAGE ==========" + Console.RESET)
     val password: String = System.console().readPassword().mkString
     
     val mnemonicPhrase: Array[Char] = Mnemonic.generateEnglishMnemonic().toCharArray()
