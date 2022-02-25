@@ -138,7 +138,7 @@ object GuapSwapAppCommands {
 
                 // Get compiled ErgoContract of proxy contract
                 val dexSwapSellProxyErgoContract: ErgoContract = GuapSwapUtils.getDexSwapSellProxyErgoContract(ctx, parameters, ErgoDexUtils.ERGODEX_SWAPSELL_CONTRACT_SAMPLE)
-
+                
                 // Convert the ErgoContract into a P2S ErgoAddress 
                 val dexSwapSellProxyAddress: ErgoAddress = Address.fromErgoTree(dexSwapSellProxyErgoContract.getErgoTree(), ctx.getNetworkType()).getErgoAddress()
                 dexSwapSellProxyAddress.toString()
@@ -197,33 +197,20 @@ object GuapSwapAppCommands {
 
                 // Generate the swap sell parameters
                 val swapSellParams: ErgoDexSwapSellParams = ErgoDexSwapSellParams.swapSellParams(parameters, poolBox, proxyBoxes)
+                val newSwapSellContractSamples: (ErgoValue[Coll[Byte]], ErgoValue[Coll[Byte]]) = ErgoDexSwapSellParams.getSubstSwapSellContractWithParams(swapSellParams)
 
                 // Get context variables
-                val FeeNum:                     ErgoValue[Int]          =   swapSellParams.paramFeeNum
-                val QuoteID:                    ErgoValue[Coll[Byte]]   =   swapSellParams.paramQuoteId
-                val MinQuoteAmount:             ErgoValue[Long]         =   swapSellParams.paramMinQuoteAmount
-                val BaseAmount:                 ErgoValue[Long]         =   swapSellParams.paramBaseAmount
-                val DexFeePerTokenNum:          ErgoValue[Long]         =   swapSellParams.paramDexFeePerTokenNum
-                val DexFeePerTokenDenom:        ErgoValue[Long]         =   swapSellParams.paramDexFeePerTokenDenom
-                val MaxMinerFee:                ErgoValue[Long]         =   swapSellParams.paramMaxMinerFee
-                val PoolNFT:                    ErgoValue[Coll[Byte]]   =   swapSellParams.paramPoolNFTId
-                val GuapSwapMinerFee:           ErgoValue[Long]         =   ErgoValue.of(GuapSwapUtils.convertMinerFee(parameters.guapswapProtocolSettings.serviceFees.protocolMinerFee))
-                val minValueOfTotalErgoDexFees: ErgoValue[Long]         =   ErgoValue.of(ErgoDexUtils.minValueOfTotalErgoDexFees(ErgoDexUtils.calculateMinExecutionFee(MaxMinerFee.getValue()), MaxMinerFee.getValue()))
+                val GuapSwapMinerFee:                   ErgoValue[Long]         =   ErgoValue.of(GuapSwapUtils.convertMinerFee(parameters.guapswapProtocolSettings.serviceFees.protocolMinerFee))
+                val minValueOfTotalErgoDexFees:         ErgoValue[Long]         =   ErgoValue.of(ErgoDexUtils.minValueOfTotalErgoDexFees(ErgoDexUtils.calculateMinExecutionFee(swapSellParams.paramMaxMinerFee.getValue()), swapSellParams.paramMaxMinerFee.getValue()))
+                val newSwapSellContractSampleWithoutPK: ErgoValue[Coll[Byte]]   =   newSwapSellContractSamples._1
                 
                 // Create context extension variables
-                var cVar0: ContextVar = ContextVar.of[Int](0, FeeNum)
-                var cVar1: ContextVar = ContextVar.of[Coll[Byte]](1, QuoteID)
-                var cVar2: ContextVar = ContextVar.of[Long](2, MinQuoteAmount)
-                var cVar3: ContextVar = ContextVar.of[Long](3, BaseAmount)
-                var cVar4: ContextVar = ContextVar.of[Long](4, DexFeePerTokenNum)
-                var cVar5: ContextVar = ContextVar.of[Long](5, DexFeePerTokenDenom)
-                var cVar6: ContextVar = ContextVar.of[Long](6, MaxMinerFee)
-                var cVar7: ContextVar = ContextVar.of[Coll[Byte]](7, PoolNFT)
-                var cVar8: ContextVar = ContextVar.of[Long](8, GuapSwapMinerFee)
-                var cVar9: ContextVar = ContextVar.of[Long](9, minValueOfTotalErgoDexFees)
-                
+                var cVar0: ContextVar = ContextVar.of(0.toByte, GuapSwapMinerFee)
+                var cVar1: ContextVar = ContextVar.of(1.toByte, minValueOfTotalErgoDexFees)
+                var cVar2: ContextVar = ContextVar.of(2.toByte, newSwapSellContractSampleWithoutPK)
+
                 // Create input boxs with context variables
-                val extendedProxyInputBoxes: List[InputBox] = proxyBoxes.map(proxybox => proxybox.withContextVars(cVar0, cVar1, cVar2, cVar3, cVar4, cVar5, cVar6, cVar7, cVar8, cVar9))
+                val extendedProxyInputBoxes: List[InputBox] = proxyBoxes.map(proxybox => proxybox.withContextVars(cVar0, cVar1, cVar2))
                 val extendedInputs: ju.List[InputBox] = seqAsJavaList(extendedProxyInputBoxes)
 
                  // Protocol fee compiled ErgoContract and ErgoAddress
@@ -233,10 +220,10 @@ object GuapSwapAppCommands {
                 val serviceFee:                 Long            =   GuapSwapUtils.calculateServiceFee(protocolFee, GuapSwapUtils.convertMinerFee(parameters.guapswapProtocolSettings.serviceFees.protocolMinerFee))
                 
                 // Swap box contract and values
-                val newSwapSellContractSample:  ErgoValue[Coll[Byte]]   =   ErgoDexSwapSellParams.getSubstSwapSellContractWithParams(swapSellParams)
+                val newSwapSellContractSample:  ErgoValue[Coll[Byte]]   =   newSwapSellContractSamples._2
                 val swapBoxContract:            ErgoTree                =   ErgoTreeSerializer.DefaultSerializer.deserializeErgoTree(newSwapSellContractSample.getValue().toArray)
                 val swapBoxValue:               Long                    =   totalPayout - serviceFee
-                
+
                 // Create tx builder
                 val txBuilder: UnsignedTransactionBuilder = ctx.newTxBuilder();
                 
@@ -263,7 +250,7 @@ object GuapSwapAppCommands {
                     .fee(GuapSwapMinerFee.getValue())
                     .sendChangeTo(protocolFeeAddress)
                     .build();
-    
+                
                 // Sign transaction
                 val signedGuapSwapTx: SignedTransaction = prover.sign(unsignedGuapSwapTx)
                 val guapswapTxId: String = ctx.sendTransaction(signedGuapSwapTx)

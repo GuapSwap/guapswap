@@ -27,30 +27,49 @@ object GuapSwapProtocolFeeContract {
       // Check that a valid Jesper Fee Withdrawal Box is created.
       val validJesperFeeWithdrawalBox = {
         val jesperBox = OUTPUTS(0)
-        (jesperBox.value == splitValue) && (jesperBox.propositionBytes == JesperPK.propBytes)
+        allOf(Coll(
+        (jesperBox.value == splitValue), 
+        (jesperBox.propositionBytes == JesperPK.propBytes)
+        ))
       }
 
       // Check that a valid George Fee Withdrawal Box is created.
       val validGeorgeFeeWithdrawalBox = {
         val georgeBox = OUTPUTS(1)
-        (georgeBox.value == splitValue) && (georgeBox.propositionBytes == GeorgePK.propBytes)
+        allOf(Coll(
+        (georgeBox.value == splitValue), 
+        (georgeBox.propositionBytes == GeorgePK.propBytes)
+        ))
       }
 
       // Check that a valid Luca Fee Withdrawal Box is created.
       val validLucaFeeWithdrawalBox = {
         val lucaBox = OUTPUTS(2)
-        (lucaBox.value == splitValue) && (lucaBox.propositionBytes == LucaPK.propBytes)
+        allOf(Coll(
+        (lucaBox.value == splitValue), 
+        (lucaBox.propositionBytes == LucaPK.propBytes)
+        ))
       }
 
       // Check that a valid Group Protocol Fee Box is created.
       val validGroupProtocolFeeBox = {
         val feeBox = OUTPUTS(3)
-        (feeBox.value >= totalFees - (3 * splitValue) - GuapSwapMinerFee) && (SELF.propositionBytes == feeBox.propositionBytes)
+        allOf(Coll(
+        (feeBox.value >= totalFees - (3 * splitValue) - GuapSwapMinerFee), 
+        (SELF.propositionBytes == feeBox.propositionBytes)
+        ))
       }
 
       // Check that a valid group fee withdrawal is initiated
       val validGroupFeeWithdrawal = {
-        validJesperFeeWithdrawalBox && validGeorgeFeeWithdrawalBox && validLucaFeeWithdrawalBox && validGroupProtocolFeeBox && (totalFees >= THRESHOLD) && (OUTPUTS.size == 5)
+        allOf(Coll(
+        validJesperFeeWithdrawalBox, 
+        validGeorgeFeeWithdrawalBox, 
+        validLucaFeeWithdrawalBox, 
+        validGroupProtocolFeeBox, 
+        (totalFees >= THRESHOLD), 
+        (OUTPUTS.size == 5)
+        ))
       }
 
       // One of these conditions must be met in order to validate the script and execute the transaction with the corresponding action.

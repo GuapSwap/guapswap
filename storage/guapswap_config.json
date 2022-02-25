@@ -9,7 +9,7 @@
             "password": "",
             "mnemonicPassword": ""
         },
-        "networkType": "MAINNET"
+        "networkType": "MAINNET"      
     },
     "parameters": {
         "guapswapProtocolSettings": {
@@ -23,7 +23,7 @@
         },
         "dexSettings": {
             "ergodexSettings": {
-                "swapAssetTicker": "SigRSV",
+                "swapAssetTicker": "SigUSD",
                 "slippageTolerancePercentage": 3,
                 "nitro": 1.2,
                 "ergodexMinerFee": 0.005 

@@ -1,21 +1,20 @@
 package protocol
 
-import org.ergoplatform.appkit.{Parameters, SecretStorage, Mnemonic, SecretString, BlockchainContext, ErgoContract}
 import scala.collection.immutable.HashMap
 import scala.util.{Try, Success, Failure}
 import java.io.{File, FileNotFoundException}
+
+import org.ergoplatform.ErgoAddress
+import org.ergoplatform.appkit._
+
 import configs.parameters.GuapSwapParameters
 import configs.parameters.protocol_settings.GuapSwapProtocolSettings
 import configs.parameters.dex_settings.GuapSwapDexSettings
-import org.ergoplatform.appkit.Address
-import org.ergoplatform.ErgoAddress
-import org.ergoplatform.appkit.ErgoValue
-import org.ergoplatform.appkit.ConstantsBuilder
-import special.sigma.SigmaProp
 import contracts.{GuapSwapDexSwapSellProxyContract, GuapSwapProtocolFeeContract}
+
+import special.sigma.SigmaProp
 import special.collection.Coll
-import org.ergoplatform.appkit.JavaHelpers
-import org.ergoplatform.appkit.ErgoType
+import sigmastate.{Values}
 
 /**
   * Object representing constants and methods relevant to GuapSwap.
@@ -23,37 +22,43 @@ import org.ergoplatform.appkit.ErgoType
 object GuapSwapUtils {
 
   // Constant representing the storage location within the project repository of the guapswap_config.json file and guapswap_proxy.json file
-  final val GUAPSWAP_CONFIG_FILE_PATH: String = "storage/guapswap_config.json"
-  final val GUAPSWAP_PROXY_FILE_PATH: String = "storage/guapswap_proxy.json"
-  final val GUAPSWAP_SWAPS_FILE_PATH: String = "storage/guapswap_swaps.json"
+  final val GUAPSWAP_CONFIG_FILE_PATH:  String = "storage/guapswap_config.json"
+  final val GUAPSWAP_PROXY_FILE_PATH:   String = "storage/guapswap_proxy.json"
+  final val GUAPSWAP_SWAPS_FILE_PATH:   String = "storage/guapswap_swaps.json"
 
-  // Default public node URL
-  final val DEFAULT_API_URL: String = "http://213.239.193.208:9053/"
+  // Default public node URL, from Ergo Platform
+  final val DEFAULT_ERGOPLATFORM_MAINNET_API_URL: String = "http://213.239.193.208:9053/"
+  final val DEFAULT_ERGOPLATFORM_TESTNET_API_URL: String = "http://213.239.193.208:9052/"
 
   // Default GetBlok TESTNET node URL
-  final val DEFAULT_GETBLOK_TESTNET_API_URL: String = "http://ergo-testnet.getblok.io:3056"
-
+  final val DEFAULT_GETBLOK_TESTNET_STRATUM_URL: String = "http://ergo-testnet.getblok.io:3056"
+  final val DEFAULT_GETBLOK_TESTNET_API_URL: String = "http://ergo-node-devnet.getblok.io:9052/"
+  
   // Default secret storage directory
   final val DEFAULT_SECRET_STORAGE_DIRECTORY: String = "storage/.secretStorage"
 
   // Default protocol fee constants
-  final val DEFAULT_PROTOCOL_FEE_PERCENTAGE: Double = 0.0025D // 0.0 for GuapSwap-Ronin CLI only
-  final val DEFAULT_PROTOCOL_UI_FEE_PERCENTAGE: Double = 0.0D // 0.0 for all CLI versions, only charged for web version with UI.
-  final val DEFAULT_PROTOCOL_MINER_FEE: Double = 0.002D
+  final val DEFAULT_PROTOCOL_FEE_PERCENTAGE:    Double = 0.0025D  // 0.0 for GuapSwap-Ronin CLI only
+  final val DEFAULT_PROTOCOL_UI_FEE_PERCENTAGE: Double = 0.0D     // 0.0 for all CLI versions, only charged for web version with UI.
+  final val DEFAULT_PROTOCOL_MINER_FEE:         Double = 0.002D
+
+  // Test address
+  final val TESTNET_ADDRESS: String = "3Ww2oseMJ33tkQUcXANnwHhq8gVsQLUPthXRiPsisKzGB74Zc9HD"
+  final val MAINNET_ADDRESS: String = "9fSek6bWQ2yusFHyJARD95KPTCrn5rfEav6msGZpxQZQvcBADQ9"
 
   // Founder PKs
-  final val JESPER_PK: String = "9hy9jt1Vuq3fZr4rSYAUqo1r2dAJBBdazV6cL8FNuBQEvM6wXfR"
-  final val GEORGE_PK: String = "9hA5gTKrx1YsTDjYiSnYqsAWawMq1GbvaemobybpCZ8qyHFBXKF"
-  final val LUCA_PK: String = "9fSek6bWQ2yusFHyJARD95KPTCrn5rfEav6msGZpxQZQvcBADQ9"
+  final val JESPER_PK:  String = "9hy9jt1Vuq3fZr4rSYAUqo1r2dAJBBdazV6cL8FNuBQEvM6wXfR"
+  final val GEORGE_PK:  String = "9hA5gTKrx1YsTDjYiSnYqsAWawMq1GbvaemobybpCZ8qyHFBXKF"
+  final val LUCA_PK:    String = "9ej8AEGCpNxPaqfgisJTU2RmYG91bWfK1hu2xT34i5Xdw4czidX"
 
   // Fee box threshold
   final val THRESHOLD: Long = Parameters.OneErg
 
   // Fee split
-  final val FEE_SPLIT: Double = 0.333
-  final val FEE_SPLIT_FRACTION: (Long, Long) = decimalToFraction(0.333)
-  final val FEE_SPLIT_NUM: Long = FEE_SPLIT_FRACTION._1
-  final val FEE_SPLIT_DENOM: Long = FEE_SPLIT_FRACTION._2
+  final val FEE_SPLIT:          Double        = 0.333
+  final val FEE_SPLIT_FRACTION: (Long, Long)  = decimalToFraction(0.333)
+  final val FEE_SPLIT_NUM:      Long          = FEE_SPLIT_FRACTION._1
+  final val FEE_SPLIT_DENOM:    Long          = FEE_SPLIT_FRACTION._2
 
   // HashMap of possible Ergo Assets
   final val validErgoAssets: HashMap[String, DexAsset] = HashMap(
@@ -286,7 +291,7 @@ object GuapSwapUtils {
     * @param dexSwapSellContractSample
     * @return Compiled ErgoContract of dex swap sell contract sample.
     */
-  def getDexSwapSellProxyErgoContract(ctx: BlockchainContext, parameters: GuapSwapParameters, dexSwapSellContractSampleScript: String): ErgoContract = {
+  def getDexSwapSellProxyErgoContract(ctx: BlockchainContext, parameters: GuapSwapParameters, dexSwapSellContractSample: String): ErgoContract = {
 
     // Get the proxy contract ErgoScript
     val dexSwapSellProxyScript: String = GuapSwapDexSwapSellProxyContract.getScript
@@ -297,8 +302,7 @@ object GuapSwapUtils {
     val protocolFeePercentageNum:       ErgoValue[Long]         =   ErgoValue.of(protocolFeePercentageFraction._1)
     val protocolFeePercentageDenom:     ErgoValue[Long]         =   ErgoValue.of(protocolFeePercentageFraction._2)
     val protocolFeeContract:            ErgoValue[Coll[Byte]]   =   ErgoValue.of(JavaHelpers.collFrom(getProtocolFeeErgoContract(ctx, parameters).getErgoTree().bytes), ErgoType.byteType())
-    val dexSwapSellContractSample:      ErgoValue[Coll[Byte]]   =   ErgoValue.of(JavaHelpers.decodeStringToColl(dexSwapSellContractSampleScript), ErgoType.byteType())
-    
+  
     // Compile the script into an ErgoContract
     val dexSwapSellErgoContract: ErgoContract = ctx.compileContract(
       ConstantsBuilder.create()
@@ -306,10 +310,10 @@ object GuapSwapUtils {
         .item("GuapSwapProtocolFeePercentageNum",   protocolFeePercentageNum.getValue())
         .item("GuapSwapProtocolFeePercentageDenom", protocolFeePercentageDenom.getValue())
         .item("GuapSwapProtocolFeeContract",        protocolFeeContract.getValue())
-        .item("DexSwapSellContractSample",          dexSwapSellContractSample.getValue())
         .build(),
         dexSwapSellProxyScript
     )
+
     dexSwapSellErgoContract
 
   }

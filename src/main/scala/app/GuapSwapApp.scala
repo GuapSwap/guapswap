@@ -16,6 +16,7 @@ import org.ergoplatform.appkit.{RestApiErgoClient, ErgoClient, SecretStorage, Mn
 
 import org.ergoplatform.wallet.secrets.{JsonSecretStorage}
 import org.ergoplatform.wallet.settings.{SecretStorageSettings, EncryptionSettings}
+import org.ergoplatform.appkit.NetworkType
 
 /**
   * Main object of the GuapSwap CLI application.
@@ -42,11 +43,13 @@ object GuapSwapApp extends CommandIOApp(
             // Print configuration load status
             println(Console.GREEN + "========== CONFIGURATIONS LOADED SUCCESSFULLY ==========" + Console.RESET)
 
-            // Setup Ergo Client
+            // Setup Ergo Clients
             val nodeConfig: GuapSwapNodeConfig = configLoadResult.get.node
             val parameters: GuapSwapParameters = configLoadResult.get.parameters
             val explorerURL: String = RestApiErgoClient.getDefaultExplorerUrl(nodeConfig.networkType)
+            //val explorerURL: String = RestApiErgoClient.getDefaultExplorerUrl(NetworkType.MAINNET)
             val ergoClient: ErgoClient = RestApiErgoClient.create(nodeConfig.nodeApi.apiUrl, nodeConfig.networkType, nodeConfig.nodeApi.apiKey, explorerURL)
+            //val ergoClient: ErgoClient = RestApiErgoClient.create(nodeConfig.nodeApi.apiUrl, NetworkType.MAINNET, nodeConfig.nodeApi.apiKey, explorerURL)
             
             // Check secret storage
             val secretStorage: SecretStorage = GuapSwapUtils.checkSecretStorage()
@@ -88,7 +91,7 @@ object GuapSwapApp extends CommandIOApp(
 
                         // Print guapswap initiating status message
                         println(Console.YELLOW + "========== GUAPSWAP ONETIME INITIATED ==========" + Console.RESET)
-                        val onetimeSwapTx: String = GuapSwapInteractions.guapswapOneTime(ergoClient, nodeConfig, parameters, proxyAddress, unlockedSecretStorage)
+                        val onetimeSwapTx: String = GuapSwapInteractions.guapswapOneTime(ergoClient, nodeConfig, parameters, proxyAddress, unlockedSecretStorage) // fix this
 
                         // TODO: check if tx is even possible
                         // Print out guapswap initiated status message

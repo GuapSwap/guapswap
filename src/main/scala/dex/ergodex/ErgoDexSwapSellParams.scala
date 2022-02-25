@@ -127,9 +127,9 @@ object ErgoDexSwapSellParams {
     * @param swapsellparams
     * @return New contract with updated context variables. 
     */
-  def getSubstSwapSellContractWithParams(swapsellparams: ErgoDexSwapSellParams): ErgoValue[Coll[Byte]] = {
+  def getSubstSwapSellContractWithParams(swapsellparams: ErgoDexSwapSellParams): (ErgoValue[Coll[Byte]], ErgoValue[Coll[Byte]]) = {
   
-    // Get the ErgoTree bytes for the swap sell contract sample
+    // Get the ErgoTree bytes for the swap sell contract sample => constantSegregationFlag == True
     val dexSwapSellContractSample: ErgoTree = JavaHelpers.decodeStringToErgoTree(ErgoDexUtils.ERGODEX_SWAPSELL_CONTRACT_SAMPLE)
     
     // Get the constants from the ErgoTree
@@ -148,12 +148,16 @@ object ErgoDexSwapSellParams {
     val const_18  = const_17.updated(18, Iso.isoEvaluatedValueToSConstant.to(Iso.isoErgoValueToSValue.to(swapsellparams.paramFeeNum)))
     val const_22  = const_18.updated(22, Iso.isoEvaluatedValueToSConstant.to(Iso.isoErgoValueToSValue.to(swapsellparams.paramMaxMinerFee)))
     val newConstants = const_22
+    val newConstantsWithoutPK = const_22.drop(0)
 
     // Substitute the constants 
     val newDexSwapSellContractSample: Values.SValue = ErgoTree.substConstants(dexSwapSellContractSample.root.right.get, newConstants)
+    val newDexSwapSellContractSampleWithoutPK: Values.SValue = ErgoTree.substConstants(dexSwapSellContractSample.root.right.get, newConstantsWithoutPK)
 
     // Return the ErgoTree contract as ErgoValue[Coll[Byte]]
-    ErgoValue.of(JavaHelpers.collFrom(ErgoTree.fromProposition(newDexSwapSellContractSample.asInstanceOf[Values.SigmaPropValue]).bytes), ErgoType.byteType())
+    val substContract: ErgoValue[Coll[Byte]] = ErgoValue.of(JavaHelpers.collFrom(ErgoTree.fromProposition(newDexSwapSellContractSample.asInstanceOf[Values.SigmaPropValue]).bytes), ErgoType.byteType())
+    val substContractWithoutPK: ErgoValue[Coll[Byte]] = ErgoValue.of(JavaHelpers.collFrom(ErgoTree.fromProposition(newDexSwapSellContractSampleWithoutPK.asInstanceOf[Values.SigmaPropValue]).bytes), ErgoType.byteType())
+    (substContractWithoutPK, substContract)
   }
 
 }
