@@ -26,6 +26,9 @@ object GuapSwapUtils {
   final val GUAPSWAP_PROXY_FILE_PATH:   String = "storage/guapswap_proxy.json"
   final val GUAPSWAP_SWAPS_FILE_PATH:   String = "storage/guapswap_swaps.json"
 
+  // Ergo Explorer URL
+  final val ERGO_EXPLORER_TX_URL_PREFIX: String = "https://explorer.ergoplatform.com/en/transactions/"
+
   // Default public node URL, from Ergo Platform
   final val DEFAULT_ERGOPLATFORM_MAINNET_API_URL: String = "http://213.239.193.208:9053/"
   final val DEFAULT_ERGOPLATFORM_TESTNET_API_URL: String = "http://213.239.193.208:9052/"

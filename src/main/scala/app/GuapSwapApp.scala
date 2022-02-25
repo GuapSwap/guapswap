@@ -99,7 +99,7 @@ object GuapSwapApp extends CommandIOApp(
                         
                         // Print tx link to user
                         println(Console.BLUE + "========== VIEW GUAPSWAP ONETIME TX IN THE ERGO-EXPLORER WITH THE LINK BELOW ==========" + Console.RESET)
-                        println(onetimeSwapTx)
+                        println(GuapSwapUtils.ERGO_EXPLORER_TX_URL_PREFIX + onetimeSwapTx)
                         
                     } else {
                         // TODO: initiate indefinite swap

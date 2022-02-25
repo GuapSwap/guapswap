@@ -258,7 +258,7 @@ object GuapSwapAppCommands {
 
             })
 
-            guapswapOneTimeTx
+            guapswapOneTimeTx.replaceAll("\"", "")
         }
 
     }

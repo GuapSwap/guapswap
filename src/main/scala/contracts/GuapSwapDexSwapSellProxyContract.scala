@@ -62,7 +62,7 @@ object GuapSwapDexSwapSellProxyContract {
             val validDexSwapBox = {
                 val dexSwapBox: Box = OUTPUTS(0)
                 allOf(Coll(
-                (SELF.value >= totalFees), 
+                (totalPayout >= totalFees), 
                 (dexSwapBox.value >= totalPayout - TotalDexFee), 
                 (dexSwapBox.propositionBytes == newDexSwapSellContractSample)
                 ))
