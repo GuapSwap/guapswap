@@ -155,8 +155,8 @@ object ErgoDexSwapSellParams {
     val newDexSwapSellContractSampleWithoutPK: Values.SValue = ErgoTree.substConstants(dexSwapSellContractSample.root.right.get, newConstantsWithoutPK)
 
     // Return the ErgoTree contract as ErgoValue[Coll[Byte]]
-    val substContract: ErgoValue[Coll[Byte]] = ErgoValue.of(JavaHelpers.collFrom(ErgoTree.fromProposition(newDexSwapSellContractSample.asInstanceOf[Values.SigmaPropValue]).bytes), ErgoType.byteType())
-    val substContractWithoutPK: ErgoValue[Coll[Byte]] = ErgoValue.of(JavaHelpers.collFrom(ErgoTree.fromProposition(newDexSwapSellContractSampleWithoutPK.asInstanceOf[Values.SigmaPropValue]).bytes), ErgoType.byteType())
+    val substContract: ErgoValue[Coll[Byte]] = ErgoValue.of(ErgoTree.fromProposition(newDexSwapSellContractSample.asInstanceOf[Values.SigmaPropValue]).bytes)
+    val substContractWithoutPK: ErgoValue[Coll[Byte]] = ErgoValue.of(ErgoTree.fromProposition(newDexSwapSellContractSampleWithoutPK.asInstanceOf[Values.SigmaPropValue]).bytes)
     (substContractWithoutPK, substContract)
   }
 

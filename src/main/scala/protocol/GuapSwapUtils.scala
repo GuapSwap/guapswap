@@ -54,6 +54,12 @@ object GuapSwapUtils {
   final val GEORGE_PK:  String = "9hA5gTKrx1YsTDjYiSnYqsAWawMq1GbvaemobybpCZ8qyHFBXKF"
   final val LUCA_PK:    String = "9ej8AEGCpNxPaqfgisJTU2RmYG91bWfK1hu2xT34i5Xdw4czidX"
 
+  // Context var check
+  final val CONTEXT_VAR_CHECK: ErgoValue[Long] = ErgoValue.of(42069.toLong)
+  final val CONTEXT_VAR_CHECK_FAIL: ErgoValue[Long] = ErgoValue.of(666.toLong)
+  final val CONTEXT_VAR_PLACEHOLDER_LONG: ErgoValue[Long] = ErgoValue.of(42.toLong)
+  final val CONTEXT_VAR_PLACEHOLDER_COLL_BYTES: ErgoValue[Coll[Byte]] = ErgoValue.of(Array(0.toByte))
+
   // Fee box threshold
   final val THRESHOLD: Long = Parameters.OneErg
 
@@ -294,7 +300,7 @@ object GuapSwapUtils {
     * @param dexSwapSellContractSample
     * @return Compiled ErgoContract of dex swap sell contract sample.
     */
-  def getDexSwapSellProxyErgoContract(ctx: BlockchainContext, parameters: GuapSwapParameters, dexSwapSellContractSample: String): ErgoContract = {
+  def getDexSwapSellProxyErgoContract(ctx: BlockchainContext, parameters: GuapSwapParameters): ErgoContract = {
 
     // Get the proxy contract ErgoScript
     val dexSwapSellProxyScript: String = GuapSwapDexSwapSellProxyContract.getScript
@@ -304,6 +310,7 @@ object GuapSwapUtils {
     val protocolFeePercentageFraction:  (Long, Long)            =   GuapSwapUtils.calculateTotalProtocolFeePercentage(parameters.guapswapProtocolSettings.serviceFees.protocolFeePercentage, parameters.guapswapProtocolSettings.serviceFees.protocolUIFeePercentage)
     val protocolFeePercentageNum:       ErgoValue[Long]         =   ErgoValue.of(protocolFeePercentageFraction._1)
     val protocolFeePercentageDenom:     ErgoValue[Long]         =   ErgoValue.of(protocolFeePercentageFraction._2)
+    val guapSwapMinerFee:               ErgoValue[Long]         =   ErgoValue.of(GuapSwapUtils.convertMinerFee(parameters.guapswapProtocolSettings.serviceFees.protocolMinerFee))
     val protocolFeeContract:            ErgoValue[Coll[Byte]]   =   ErgoValue.of(JavaHelpers.collFrom(getProtocolFeeErgoContract(ctx, parameters).getErgoTree().bytes), ErgoType.byteType())
   
     // Compile the script into an ErgoContract
@@ -313,8 +320,9 @@ object GuapSwapUtils {
         .item("GuapSwapProtocolFeePercentageNum",   protocolFeePercentageNum.getValue())
         .item("GuapSwapProtocolFeePercentageDenom", protocolFeePercentageDenom.getValue())
         .item("GuapSwapProtocolFeeContract",        protocolFeeContract.getValue())
-        .build(),
-        dexSwapSellProxyScript
+        .item("GuapSwapMinerFee",                   guapSwapMinerFee.getValue())
+        .build(), 
+      dexSwapSellProxyScript
     )
 
     dexSwapSellErgoContract

@@ -91,7 +91,7 @@ object GuapSwapApp extends CommandIOApp(
 
                         // Print guapswap initiating status message
                         println(Console.YELLOW + "========== GUAPSWAP ONETIME INITIATED ==========" + Console.RESET)
-                        val onetimeSwapTx: String = GuapSwapInteractions.guapswapOneTime(ergoClient, nodeConfig, parameters, proxyAddress, unlockedSecretStorage) // fix this
+                        val onetimeSwapTxId: String = GuapSwapInteractions.guapswapOneTime(ergoClient, nodeConfig, parameters, proxyAddress, unlockedSecretStorage)
 
                         // TODO: check if tx is even possible
                         // Print out guapswap initiated status message
@@ -99,7 +99,7 @@ object GuapSwapApp extends CommandIOApp(
                         
                         // Print tx link to user
                         println(Console.BLUE + "========== VIEW GUAPSWAP ONETIME TX IN THE ERGO-EXPLORER WITH THE LINK BELOW ==========" + Console.RESET)
-                        println(GuapSwapUtils.ERGO_EXPLORER_TX_URL_PREFIX + onetimeSwapTx)
+                        println(GuapSwapUtils.ERGO_EXPLORER_TX_URL_PREFIX + onetimeSwapTxId)
                         
                     } else {
                         // TODO: initiate indefinite swap
@@ -110,7 +110,27 @@ object GuapSwapApp extends CommandIOApp(
                 }
 
                 case GuapSwapCli.Refund(proxyAddress) => {
-                    println(s"refunded box at address: ${proxyAddress}")
+
+                    // Unlock secret storage
+                    val unlockedSecretStorage: SecretStorage = GuapSwapUtils.unlockSecretStorage(secretStorage) match {
+                        case Success(unlockedStorage) => unlockedStorage
+                        case Failure(exception) => {
+                            println("Please try swap again.")
+                            throw exception
+                        }
+                    }
+                    
+                    // Print guapswap initiating status message
+                    println(Console.YELLOW + "========== GUAPSWAP REFUND INITIATED ==========" + Console.RESET)
+                    val refundTxId: String = GuapSwapInteractions.guapswapRefund(ergoClient: ErgoClient, nodeConfig: GuapSwapNodeConfig, parameters: GuapSwapParameters, proxyAddress: String, unlockedSecretStorage: SecretStorage)
+
+                    // TODO: check if tx is even possible
+                    // Print out guapswap initiated status message
+                    println(Console.GREEN + "========== GUAPSWAP REFUND SUCCEEDED ==========" + Console.RESET)
+                    
+                    // Print tx link to user
+                    println(Console.BLUE + "========== VIEW GUAPSWAP REFUND TX IN THE ERGO-EXPLORER WITH THE LINK BELOW ==========" + Console.RESET)
+                    println(GuapSwapUtils.ERGO_EXPLORER_TX_URL_PREFIX + refundTxId)
                     
                     // Return successful exit code
                     IO(ExitCode.Success)
