@@ -1,6 +1,3 @@
-*.class
-*.log
-
 # workspace
 .DS_Store
 .vscode
