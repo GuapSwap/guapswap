@@ -15,6 +15,14 @@ import contracts.{GuapSwapDexSwapSellProxyContract, GuapSwapProtocolFeeContract}
 import special.sigma.SigmaProp
 import special.collection.Coll
 import sigmastate.{Values}
+import java.nio.file.Files
+import java.io.FileWriter
+import org.bouncycastle.util.encoders.UTF8
+import java.nio.charset.Charset
+import org.apache.commons.io.input.CharSequenceReader
+import java.util.Date
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 /**
   * Object representing constants and methods relevant to GuapSwap.
@@ -23,8 +31,8 @@ object GuapSwapUtils {
 
   // Constant representing the storage location within the project repository of the guapswap_config.json file and guapswap_proxy.json file
   final val GUAPSWAP_CONFIG_FILE_PATH:  String = "storage/guapswap_config.json"
-  final val GUAPSWAP_PROXY_FILE_PATH:   String = "storage/guapswap_proxy.json"
-  final val GUAPSWAP_SWAPS_FILE_PATH:   String = "storage/guapswap_swaps.json"
+  final val GUAPSWAP_PROXY_FILE_PATH:   String = "storage/guapswap_proxy.log"
+  final val GUAPSWAP_SWAP_FILE_PATH:   String = "storage/guapswap_swap.log"
 
   // Ergo Explorer URL
   final val ERGO_EXPLORER_TX_URL_PREFIX: String = "https://explorer.ergoplatform.com/en/transactions/"
@@ -362,6 +370,23 @@ object GuapSwapUtils {
             protocolFeeContractScript
     )
     protocolFeeErgoContract
+  }
+
+  /**
+    * Save string to file log, with date and time in UTC.
+    *
+    * @param string
+    * @param path
+    */
+  def save(string: String, path: String): Unit = {
+    val file: FileWriter = new FileWriter(path, true)
+    val dateTime: LocalDateTime = LocalDateTime.now(ZoneId.of("UTC"))
+    val date: String = dateTime.toString().split("[T]")(0)
+    val time: String = dateTime.toString().split("[T]")(1).split("\\.")(0)
+
+    file.append(System.lineSeparator())
+    file.append(s"[UTC ${date} ${time}] ${string}")
+    file.close()  
   }
     
 }

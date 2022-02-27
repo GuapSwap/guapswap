@@ -64,13 +64,17 @@ object GuapSwapApp extends CommandIOApp(
                     // Generate proxy address
                     println(Console.YELLOW + "========== GUAPSWAP PROXY ADDRESS BEING GENERATED ==========" + Console.RESET)
                     
-                    val proxyScript: String = GuapSwapInteractions.generateProxyAddress(ergoClient, parameters)
+                    val proxyAddress: String = GuapSwapInteractions.generateProxyAddress(ergoClient, parameters)
                     
                     println(Console.GREEN + "========== GUAPSWAP PROXY ADDRESS GENERATION SUCCESSFULL ==========" + Console.RESET)
+
+                    // Print out guapswap save tx status message
+                    println(Console.GREEN + "========== GUAPSWAP PROXY ADDRESS SAVED ==========" + Console.RESET)
+                    GuapSwapUtils.save(proxyAddress, GuapSwapUtils.GUAPSWAP_PROXY_FILE_PATH)
                     
                     // TODO: Add proxy script to guapswap_proxy.json
                     println(Console.BLUE + "========== INSERT GUAPSWAP PROXY (P2S) ADDRESS BELOW INTO YOUR MINER ==========" + Console.RESET)
-                    println(proxyScript)
+                    println(proxyAddress)
 
                     // Return successful exit code
                     IO(ExitCode.Success)
@@ -89,13 +93,17 @@ object GuapSwapApp extends CommandIOApp(
 
                     if (onetime) {
 
-                        // Print guapswap initiating status message
-                        println(Console.YELLOW + "========== GUAPSWAP ONETIME INITIATED ==========" + Console.RESET)
+                        // Print guapswap initiated status message
+                        println(Console.YELLOW + "========== GUAPSWAP ONETIME TX INITIATED ==========" + Console.RESET)
                         val onetimeSwapTxId: String = GuapSwapInteractions.guapswapOneTime(ergoClient, nodeConfig, parameters, proxyAddress, unlockedSecretStorage)
 
                         // TODO: check if tx is even possible
-                        // Print out guapswap initiated status message
-                        println(Console.GREEN + "========== GUAPSWAP ONETIME SUCCEEDED ==========" + Console.RESET)
+                        // Print out guapswap succeeded status message
+                        println(Console.GREEN + "========== GUAPSWAP ONETIME TX SUCCESSFULL ==========" + Console.RESET)
+
+                        // Print out guapswap save tx status message
+                        println(Console.GREEN + "========== GUAPSWAP ONETIME TX SAVED ==========" + Console.RESET)
+                        GuapSwapUtils.save(onetimeSwapTxId, GuapSwapUtils.GUAPSWAP_SWAP_FILE_PATH)
                         
                         // Print tx link to user
                         println(Console.BLUE + "========== VIEW GUAPSWAP ONETIME TX IN THE ERGO-EXPLORER WITH THE LINK BELOW ==========" + Console.RESET)
