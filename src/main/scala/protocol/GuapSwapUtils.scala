@@ -177,22 +177,27 @@ object GuapSwapUtils {
     */
   def decimalToFraction(number: Double): (Long, Long) = {
     
-    // Format the number correctly for calculation such that there are no trailing zeros. 
-    val bigdecimalNumber: BigDecimal = BigDecimal.apply(number).underlying().stripTrailingZeros()
-    val bigdecimalToDouble: Double = bigdecimalNumber.doubleValue()
-    val listMatch: List[String] = bigdecimalToDouble.toString.split("\\.").toList
-    
-    // Get the fractional representation of the decimal number
-    val fractionTuple: (Long, Long) = listMatch match {
-      case List(whole, fractional) => {
-        val numDecimals: Double = fractional.length().toDouble
-        val denominator: Long = Math.pow(10D, numDecimals).toLong
-        val numerator: Long = whole.toLong * denominator + fractional.toLong
-        (numerator, denominator)
+    // Ignore if zero
+    if (number == 0.0) {
+      (0.toLong, 1.toLong)
+    } else {
+      // Format the number correctly for calculation such that there are no trailing zeros. 
+      val bigdecimalNumber: BigDecimal = BigDecimal.apply(number).underlying().stripTrailingZeros()
+      val bigdecimalToDouble: Double = bigdecimalNumber.doubleValue()
+      val listMatch: List[String] = bigdecimalToDouble.toString.split("\\.").toList
+      
+      // Get the fractional representation of the decimal number
+      val fractionTuple: (Long, Long) = listMatch match {
+        case List(whole, fractional) => {
+          val numDecimals: Double = fractional.length().toDouble
+          val denominator: Long = Math.pow(10D, numDecimals).toLong
+          val numerator: Long = whole.toLong * denominator + fractional.toLong
+          (numerator, denominator)
+        }
       }
-    }
 
-    fractionTuple
+      fractionTuple
+    }
   }
 
   /**
