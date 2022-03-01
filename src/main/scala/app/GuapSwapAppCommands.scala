@@ -272,8 +272,38 @@ object GuapSwapAppCommands {
         }
 
         //TODO: Automatic swap
-        def guapswapAutomatic(): String = {
-            ""
+        def guapswapAutomatic(ergoClient: ErgoClient, nodeConfig: GuapSwapNodeConfig, parameters: GuapSwapParameters, proxyAddress: String, unlockedSecretStorage: SecretStorage): Unit = {
+            
+            println(Console.YELLOW + "========== Querrying Ergo blockchain once every 60 minutes to check for a mining reward payout and perform a swap. ==========" + Console.RESET)
+
+            // milliseconds in one hour = 1000 ms/s * 60 s/m * 60 m/h
+            val milliSecondsInOneHour: Long = 1000 * 60 * 60
+            val test: Long = 1000 * 10
+
+            while (true) {
+
+                // Print guapswap onetime initiated status message
+                println(Console.YELLOW + "========== GUAPSWAP AUTOMATIC TX INITIATED ==========" + Console.RESET)
+                val automaticSwapTxId: String = guapswapOneTime(ergoClient, nodeConfig, parameters, proxyAddress, unlockedSecretStorage)
+                
+                // Perform a swap
+                println(Console.GREEN + "========== GUAPSWAP AUTOMATIC TX SUCCESSFULL ==========" + Console.RESET)
+
+                // Print out guapswap save tx status message
+                println(Console.GREEN + "========== GUAPSWAP AUTOMATIC TX SAVED ==========" + Console.RESET)
+                GuapSwapUtils.save(automaticSwapTxId, GuapSwapUtils.GUAPSWAP_SWAP_FILE_PATH)
+                        
+                // Print tx link to the user
+                println(Console.BLUE + "========== VIEW GUAPSWAP ONETIME TX IN THE ERGO-EXPLORER WITH THE LINK BELOW ==========" + Console.RESET)
+                println(GuapSwapUtils.ERGO_EXPLORER_TX_URL_PREFIX + automaticSwapTxId)
+                
+                // Print warning
+                 println(Console.BLUE + "========== AUTOMATIC TX WILL OCCUR AGAIN WITHIN THE NEXT 60 MINUTES ==========" + Console.RESET)
+
+                // Put thread to sleep for 60 min
+                Thread.sleep(test)
+            }
+
         }
 
         /**

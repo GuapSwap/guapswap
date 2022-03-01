@@ -90,7 +90,7 @@ object GuapSwapApp extends CommandIOApp(
 
                     if (onetime) {
 
-                        // Print guapswap initiated status message
+                        // Print guapswap onetime initiated status message
                         println(Console.YELLOW + "========== GUAPSWAP ONETIME TX INITIATED ==========" + Console.RESET)
                         val onetimeSwapTxId: String = GuapSwapInteractions.guapswapOneTime(ergoClient, nodeConfig, parameters, proxyAddress, unlockedSecretStorage)
 
@@ -101,12 +101,17 @@ object GuapSwapApp extends CommandIOApp(
                         println(Console.GREEN + "========== GUAPSWAP ONETIME TX SAVED ==========" + Console.RESET)
                         GuapSwapUtils.save(onetimeSwapTxId, GuapSwapUtils.GUAPSWAP_SWAP_FILE_PATH)
                         
-                        // Print tx link to user
+                        // Print tx link to the user
                         println(Console.BLUE + "========== VIEW GUAPSWAP ONETIME TX IN THE ERGO-EXPLORER WITH THE LINK BELOW ==========" + Console.RESET)
                         println(GuapSwapUtils.ERGO_EXPLORER_TX_URL_PREFIX + onetimeSwapTxId)
                         
                     } else {
-                        // TODO: initiate indefinite swap
+                        
+                        // Print guapswap initiated status message
+                        println(Console.GREEN + "========== GUAPSWAP AUTOMATIC MODE INITIATED ==========" + Console.RESET)
+                        println(Console.BLUE + "========== Program will now run INDEFINITELY and will NOT ask for confirmation to SIGN the TX. To TERMINATE execution, please press the key combination 'CTRL + C'. ==========" + Console.RESET)
+                        GuapSwapInteractions.guapswapAutomatic(ergoClient, nodeConfig, parameters, proxyAddress, unlockedSecretStorage)
+
                     }
                     
                     // Return successful exit code

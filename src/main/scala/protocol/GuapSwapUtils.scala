@@ -72,10 +72,8 @@ object GuapSwapUtils {
   final val THRESHOLD: Long = Parameters.OneErg
 
   // Fee split
-  final val FEE_SPLIT:          Double        = 0.333
-  final val FEE_SPLIT_FRACTION: (Long, Long)  = decimalToFraction(0.333)
-  final val FEE_SPLIT_NUM:      Long          = FEE_SPLIT_FRACTION._1
-  final val FEE_SPLIT_DENOM:    Long          = FEE_SPLIT_FRACTION._2
+  final val FEE_SPLIT_NUM: Long = 1
+  final val FEE_SPLIT_DENOM: Long = 3
 
   // HashMap of possible Ergo Assets
   final val validErgoAssets: HashMap[String, DexAsset] = HashMap(
@@ -221,9 +219,7 @@ object GuapSwapUtils {
       if (files.length == 0) {
         throw new FileNotFoundException
       } else {
-        val secretFile: File = files(0)
-        val secretStorage: SecretStorage = SecretStorage.loadFrom(secretFile)
-        secretStorage
+        SecretStorage.loadFrom(files(0))
       }
 
     } else {
