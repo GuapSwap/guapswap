@@ -54,7 +54,7 @@ object GuapSwapDexSwapSellProxyContract {
                     UserPK
                 )
 
-                // Insert the new constants into the ErgoTree based on the following order: Long => Coll[Byte] => SigmaProp
+                // Insert the new constants into the ErgoTree
                 val newDexSwapSellContractSample_SigmaProp: Coll[Byte] = substConstants(DexSwapSellContractSampleWithoutPK, positions_SigmaProp, newValues_SigmaProp)
                 val newDexSwapSellContractSample:           Coll[Byte] = newDexSwapSellContractSample_SigmaProp
 

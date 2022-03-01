@@ -54,8 +54,6 @@ object GuapSwapApp extends CommandIOApp(
             // Check secret storage
             val secretStorage: SecretStorage = GuapSwapUtils.checkSecretStorage()
 
-            // Unlock secret storage
-
             // Parse commands from the command line
             (GuapSwapCli.generateProxyAddressSubCommandOpts orElse GuapSwapCli.swapSubCommandOpts orElse GuapSwapCli.refundSubCommandOpts orElse GuapSwapCli.listSubCommandOpts).map {
                 
@@ -72,7 +70,6 @@ object GuapSwapApp extends CommandIOApp(
                     println(Console.GREEN + "========== GUAPSWAP PROXY ADDRESS SAVED ==========" + Console.RESET)
                     GuapSwapUtils.save(proxyAddress, GuapSwapUtils.GUAPSWAP_PROXY_FILE_PATH)
                     
-                    // TODO: Add proxy script to guapswap_proxy.json
                     println(Console.BLUE + "========== INSERT GUAPSWAP PROXY (P2S) ADDRESS BELOW INTO YOUR MINER ==========" + Console.RESET)
                     println(proxyAddress)
 
@@ -97,7 +94,6 @@ object GuapSwapApp extends CommandIOApp(
                         println(Console.YELLOW + "========== GUAPSWAP ONETIME TX INITIATED ==========" + Console.RESET)
                         val onetimeSwapTxId: String = GuapSwapInteractions.guapswapOneTime(ergoClient, nodeConfig, parameters, proxyAddress, unlockedSecretStorage)
 
-                        // TODO: check if tx is even possible
                         // Print out guapswap succeeded status message
                         println(Console.GREEN + "========== GUAPSWAP ONETIME TX SUCCESSFULL ==========" + Console.RESET)
 
@@ -152,6 +148,7 @@ object GuapSwapApp extends CommandIOApp(
                 }
 
             } 
+
         } else {
 
             // Print configuration load status
@@ -163,6 +160,6 @@ object GuapSwapApp extends CommandIOApp(
             // Return error exit code
             Opts(IO(ExitCode.Error))
         }
-
+        
     }
 }

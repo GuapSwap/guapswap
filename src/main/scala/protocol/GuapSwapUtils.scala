@@ -209,20 +209,21 @@ object GuapSwapUtils {
    
     println(Console.YELLOW + "========== LOADING SECRET STORAGE ==========" + Console.RESET)
   
-    var secretFile: File = new File(DEFAULT_SECRET_STORAGE_DIRECTORY)
+    val secretDirectory: File = new File(DEFAULT_SECRET_STORAGE_DIRECTORY)
     
     // Check if directory exists
-    if (secretFile.isDirectory()) {
+    if (secretDirectory.isDirectory()) {
 
       // List files in the directory
-      val files: Array[File] = secretFile.listFiles()
+      val files: Array[File] = secretDirectory.listFiles()
 
       // Check if there are files that exist in the directory
       if (files.length == 0) {
         throw new FileNotFoundException
       } else {
-        secretFile = files(0)
-        SecretStorage.loadFrom(secretFile)
+        val secretFile: File = files(0)
+        val secretStorage: SecretStorage = SecretStorage.loadFrom(secretFile)
+        secretStorage
       }
 
     } else {
@@ -248,7 +249,7 @@ object GuapSwapUtils {
     println(Console.GREEN + "========== SECRET STORAGE CREATED ==========" + Console.RESET)
     println(Console.BLUE + "========== YOUR MNEMONIC AND SECRET STORAGE ARE THE FOLLOWING ==========" + Console.RESET)
     println("Mnemonic Phrase: " + mnemonic.getPhrase().toStringUnsecure())
-    println("SecretStorage Directory: " + generatedSecretStorage.getFile().getPath())
+    println("Secret Storage Directory: " + generatedSecretStorage.getFile().getPath())
     
     generatedSecretStorage
   
@@ -294,7 +295,7 @@ object GuapSwapUtils {
       }
 
       case Failure(exception) => {
-          println(Console.RED + "========== SECRET STORAGE DOES NOT EXISTS ==========" + Console.RESET)
+          println(Console.RED + "========== SECRET STORAGE DOES NOT EXIST ==========" + Console.RESET)
           
           // Generate secret storage
           val generatedSecretStorage: SecretStorage = generateSecretStorage()
@@ -384,13 +385,22 @@ object GuapSwapUtils {
     * @param path
     */
   def save(string: String, path: String): Unit = {
+
+    // Get access to the file
     val file: FileWriter = new FileWriter(path, true)
+
+    // Get the date and time in UTC format
     val dateTime: LocalDateTime = LocalDateTime.now(ZoneId.of("UTC"))
+
+    // Format the time string 
     val date: String = dateTime.toString().split("[T]")(0)
     val time: String = dateTime.toString().split("[T]")(1).split("\\.")(0)
 
+    // Append text to file
     file.append(System.lineSeparator())
     file.append(s"[UTC ${date} ${time}] ${string}")
+
+    // Close the file and io-stream
     file.close()  
   }
     
