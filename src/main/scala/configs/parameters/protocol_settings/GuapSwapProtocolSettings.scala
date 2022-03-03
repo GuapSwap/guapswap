@@ -8,5 +8,7 @@ package configs.parameters.protocol_settings
   */
 case class GuapSwapProtocolSettings(
     val userAddress: String,
-    val serviceFees: GuapSwapServiceFees
+    val serviceFees: GuapSwapServiceFees,
+    val swapIntervalInHours: Long,
+    val dexChoice: String
 )

@@ -12,9 +12,9 @@ import org.ergoplatform.appkit._
 
 import configs.node.GuapSwapNodeConfig
 import configs.parameters.GuapSwapParameters
-import protocol.GuapSwapUtils
 import contracts.{GuapSwapDexSwapSellProxyContract, GuapSwapProtocolFeeContract}
 import dex.ergodex.{ErgoDexUtils, ErgoDexSwap, ErgoDexSwapSellParams}
+import protocol.GuapSwapUtils
 
 import sigmastate.{Values, SType}
 import sigmastate.Values.{EvaluatedValue, ErgoTree}
@@ -59,7 +59,7 @@ object GuapSwapAppCommands {
 
         // Swap command
         val swapSubCommandOpts: Opts[Swap] = {
-            Opts.subcommand(name = "swap", help = "Loops indefinitely, querying Ergo blockchain once every 60 min to check for a payout and performs the swap automatically.") {
+            Opts.subcommand(name = "swap", help = "Loops indefinitely, querying Ergo blockchain once every interval to check for a payout and perform the swap automatically.") {
                 
                 // Defining --onetime flag for running swap once instead of continuously
                 val onetimeFlagOpts: Opts[Boolean] = {
@@ -185,22 +185,24 @@ object GuapSwapAppCommands {
 
             // Generate blockchain context
             val guapswapOneTimeTxId: String = ergoClient.execute((ctx: BlockchainContext) => {
-
+                
                 // Search for the pool box based on the pool Id => THERE SHOULD ONLY BE ONE SUCH BOX
                 var poolBoxes: List[InputBox] = List.empty[InputBox]
                 try {
                     poolBoxes = ctx.getUnspentBoxesFor(poolContractAddress, 0, 20).asScala.toList
                 } catch {
                     case exception: IllegalArgumentException => {
-                        println("No proxy boxes exists.")
+                        println("No ErgoDex pool boxes exist.")
                         throw exception
                     }
                 }
 
+                // Get the pool box based on the matching token id
                 val poolBox: InputBox = poolBoxes.filter(poolbox => poolbox.getTokens().get(0).getId().toString.equals(poolIdSearch))(0)
                 
-                // Search for all the proxy boxes => assumes a max payout of 1/hr for one week (i.e. 168 maxmimum boxes)
-                val proxyBoxes: List[InputBox] = ctx.getUnspentBoxesFor(proxyContractAddress, 0, 168).asScala.toList
+                // Search for all the proxy boxes 
+                val proxyBoxes: List[InputBox] = ctx.getUnspentBoxesFor(proxyContractAddress, 0, 50).asScala.toList
+                proxyBoxes.foreach(proxy => println(proxy))
                 val totalPayout: Long = proxyBoxes.foldLeft(0L)((acc, proxybox) => acc + proxybox.getValue())
 
                 // Generate the swap sell parameters
@@ -222,7 +224,7 @@ object GuapSwapAppCommands {
                 val extendedInputs: ju.List[InputBox] = seqAsJavaList(extendedProxyInputBoxes)
 
                  // Protocol fee compiled ErgoContract and ErgoAddress
-                val protocolFeeErgoContract:    ErgoContract    =   GuapSwapUtils.getProtocolFeeErgoContract(ctx, parameters)
+                val protocolFeeErgoContract:    ErgoContract    =   GuapSwapUtils.getProtocolFeeErgoContract(ctx)
                 val protocolFeeAddress:         ErgoAddress     =   Address.fromErgoTree(protocolFeeErgoContract.getErgoTree(), ctx.getNetworkType()).getErgoAddress()
                 val protocolFee:                Long            =   GuapSwapUtils.calculateTotalProtocolFee(parameters.guapswapProtocolSettings.serviceFees.protocolFeePercentage, parameters.guapswapProtocolSettings.serviceFees.protocolUIFeePercentage, totalPayout)
                 val guapSwapMinerFee:           Long            =   GuapSwapUtils.convertMinerFee(parameters.guapswapProtocolSettings.serviceFees.protocolMinerFee)
@@ -271,40 +273,65 @@ object GuapSwapAppCommands {
             guapswapOneTimeTxId.replaceAll("\"", "")
         }
 
-        //TODO: Automatic swap
+        /**
+          * Launch the automatic swap
+          *
+          * @param ergoClient
+          * @param nodeConfig
+          * @param parameters
+          * @param proxyAddress
+          * @param unlockedSecretStorage
+          */
         def guapswapAutomatic(ergoClient: ErgoClient, nodeConfig: GuapSwapNodeConfig, parameters: GuapSwapParameters, proxyAddress: String, unlockedSecretStorage: SecretStorage): Unit = {
             
-            println(Console.YELLOW + "========== Querrying Ergo blockchain once every 60 minutes to check for a mining reward payout and perform a swap. ==========" + Console.RESET)
+            // Print notification statement
+            println(Console.BLUE + "========== Program will run INDEFINITELY and will NOT ask for confirmation to SIGN the TX. To TERMINATE execution, close the terminal session. ==========" + Console.RESET)
 
-            // milliseconds in one hour = 1000 ms/s * 60 s/m * 60 m/h
-            val milliSecondsInOneHour: Long = 1000 * 60 * 60
-            val test: Long = 1000 * 10
+            // Convert swap interval into milliseconds
+            val milliSecondsPerMinute: Long = 1000 * 60
+            val minutesPerHour: Long = 60
+            var minutes: Long = minutesPerHour * parameters.guapswapProtocolSettings.swapIntervalInHours
+            
+            // Set the default swap time interval to be 60 minutes, this gives enough time for block confirmation
+            if (minutes < 60) {
+                minutes = 60
+            }
+            
+            // Calculate the time based on user config settings
+            val time: Long = milliSecondsPerMinute * minutes
+            //val test: Long = 15000
 
             while (true) {
 
-                // Print guapswap onetime initiated status message
-                println(Console.YELLOW + "========== GUAPSWAP AUTOMATIC TX INITIATED ==========" + Console.RESET)
-                val automaticSwapTxId: String = guapswapOneTime(ergoClient, nodeConfig, parameters, proxyAddress, unlockedSecretStorage)
-                
-                // Perform a swap
-                println(Console.GREEN + "========== GUAPSWAP AUTOMATIC TX SUCCESSFULL ==========" + Console.RESET)
+                try {
+                    // Print guapswap automatic initiated status message
+                    println(Console.YELLOW + "========== GUAPSWAP AUTOMATIC TX INITIATED ==========" + Console.RESET)
+                    val automaticSwapTxId: String = GuapSwapAppCommands.GuapSwapInteractions.guapswapOneTime(ergoClient, nodeConfig, parameters, proxyAddress, unlockedSecretStorage)
 
-                // Print out guapswap save tx status message
-                println(Console.GREEN + "========== GUAPSWAP AUTOMATIC TX SAVED ==========" + Console.RESET)
-                GuapSwapUtils.save(automaticSwapTxId, GuapSwapUtils.GUAPSWAP_SWAP_FILE_PATH)
-                        
-                // Print tx link to the user
-                println(Console.BLUE + "========== VIEW GUAPSWAP ONETIME TX IN THE ERGO-EXPLORER WITH THE LINK BELOW ==========" + Console.RESET)
-                println(GuapSwapUtils.ERGO_EXPLORER_TX_URL_PREFIX + automaticSwapTxId)
-                
-                // Print warning
-                 println(Console.BLUE + "========== AUTOMATIC TX WILL OCCUR AGAIN WITHIN THE NEXT 60 MINUTES ==========" + Console.RESET)
+                    // Perform a swap
+                    println(Console.GREEN + "========== GUAPSWAP AUTOMATIC TX SUCCESSFULL ==========" + Console.RESET)
 
-                // Put thread to sleep for 60 min
-                Thread.sleep(test)
-            }
+                    // Print out guapswap save tx status message
+                    println(Console.GREEN + "========== GUAPSWAP AUTOMATIC TX SAVED ==========" + Console.RESET)
+                    GuapSwapUtils.save(automaticSwapTxId, GuapSwapUtils.GUAPSWAP_SWAP_FILE_PATH)
+                            
+                    // Print tx link to the user
+                    println(Console.BLUE + "========== VIEW GUAPSWAP AUTOMATIC TX IN THE ERGO-EXPLORER WITH THE LINK BELOW ==========" + Console.RESET)
+                    println(GuapSwapUtils.ERGO_EXPLORER_TX_URL_PREFIX + automaticSwapTxId)
+
+                } catch {
+                    case e: Throwable => {
+                        println(Console.RED + "========== NO VALID PROXY BOX FOUND FOR THE AUTOMATIC SWAP TX ==========" + Console.RESET)
+                    }
+                }
+            
+                // Print warning and put the thread to sleep for the alloted interval of time
+                println(Console.BLUE + s"========== AUTOMATIC TX ATTEMPT WILL OCCUR AGAIN WITHIN THE NEXT ${minutes} MINUTES ==========" + Console.RESET)
+                Thread.sleep(time)
+            }   
 
         }
+
 
         /**
           * Refund transaction.
@@ -376,6 +403,30 @@ object GuapSwapAppCommands {
 
             // Remove quotation marks from string.
             refundTxId.replaceAll("\"", "")
+        }
+
+        def guapswapList(ergoClient: ErgoClient, proxyAddress: String): Unit = {
+
+            // Generate the blockchain context
+            ergoClient.execute((ctx: BlockchainContext) => {
+                
+                // Convert proxy contract P2S address to an Address
+                val proxyContractAddress: Address = Address.create(proxyAddress)
+
+                try {
+
+                    // Search for all the proxy boxes => assumes a max payout of 1/hr for one week (i.e. 168 maxmimum boxes)
+                    val proxyBoxes: List[InputBox] = ctx.getUnspentBoxesFor(proxyContractAddress, 0, 168).asScala.toList
+                
+                    // Print the proxy boxes
+                    proxyBoxes.foreach(proxy => println(proxy.toJson(true)))
+
+                } catch {
+                    case e: Throwable =>  println(Console.RED + "========== NO PROXY BOXES AT THE GIVEN ADDRESS FOUND ==========" + Console.RESET)
+                }
+            
+            })
+
         }
 
     }

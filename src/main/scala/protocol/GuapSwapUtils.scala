@@ -33,6 +33,7 @@ object GuapSwapUtils {
   final val GUAPSWAP_CONFIG_FILE_PATH:  String = "storage/guapswap_config.json"
   final val GUAPSWAP_PROXY_FILE_PATH:   String = "storage/guapswap_proxy.log"
   final val GUAPSWAP_SWAP_FILE_PATH:   String = "storage/guapswap_swap.log"
+  final val GUAPSWAP_REFUND_FILE_PATH: String = "storage/guapswap_refund.log"
 
   // Ergo Explorer URL
   final val ERGO_EXPLORER_TX_URL_PREFIX: String = "https://explorer.ergoplatform.com/en/transactions/"
@@ -54,8 +55,7 @@ object GuapSwapUtils {
   final val DEFAULT_PROTOCOL_MINER_FEE:         Double = 0.002D
 
   // Test address
-  final val TESTNET_ADDRESS: String = "3Ww2oseMJ33tkQUcXANnwHhq8gVsQLUPthXRiPsisKzGB74Zc9HD"
-  final val MAINNET_ADDRESS: String = "9fSek6bWQ2yusFHyJARD95KPTCrn5rfEav6msGZpxQZQvcBADQ9"
+  final val MAINNET_TEST_ADDRESS: String = "9g462nhKH6kzQetBobihiD9x225SZcVz2cbJabgUzXRHNmTRb52"
 
   // Founder PKs
   final val JESPER_PK:  String = "9hy9jt1Vuq3fZr4rSYAUqo1r2dAJBBdazV6cL8FNuBQEvM6wXfR"
@@ -67,13 +67,6 @@ object GuapSwapUtils {
   final val CONTEXT_VAR_CHECK_FAIL: ErgoValue[Long] = ErgoValue.of(666.toLong)
   final val CONTEXT_VAR_PLACEHOLDER_LONG: ErgoValue[Long] = ErgoValue.of(42.toLong)
   final val CONTEXT_VAR_PLACEHOLDER_COLL_BYTES: ErgoValue[Coll[Byte]] = ErgoValue.of(Array(0.toByte))
-
-  // Fee box threshold
-  final val THRESHOLD: Long = Parameters.OneErg
-
-  // Fee split
-  final val FEE_SPLIT_NUM: Long = 1
-  final val FEE_SPLIT_DENOM: Long = 3
 
   // HashMap of possible Ergo Assets
   final val validErgoAssets: HashMap[String, DexAsset] = HashMap(
@@ -321,7 +314,7 @@ object GuapSwapUtils {
     val protocolFeePercentageNum:       ErgoValue[Long]         =   ErgoValue.of(protocolFeePercentageFraction._1)
     val protocolFeePercentageDenom:     ErgoValue[Long]         =   ErgoValue.of(protocolFeePercentageFraction._2)
     val guapSwapMinerFee:               ErgoValue[Long]         =   ErgoValue.of(GuapSwapUtils.convertMinerFee(parameters.guapswapProtocolSettings.serviceFees.protocolMinerFee))
-    val protocolFeeContract:            ErgoValue[Coll[Byte]]   =   ErgoValue.of(JavaHelpers.collFrom(getProtocolFeeErgoContract(ctx, parameters).getErgoTree().bytes), ErgoType.byteType())
+    val protocolFeeContract:            ErgoValue[Coll[Byte]]   =   ErgoValue.of(JavaHelpers.collFrom(getProtocolFeeErgoContract(ctx).getErgoTree().bytes), ErgoType.byteType())
   
     // Compile the script into an ErgoContract
     val dexSwapSellErgoContract: ErgoContract = ctx.compileContract(
@@ -346,17 +339,13 @@ object GuapSwapUtils {
     * @param parameters
     * @return Compiled ErgoContract of protocol fee contract.
     */
-  def getProtocolFeeErgoContract(ctx: BlockchainContext, parameters: GuapSwapParameters): ErgoContract = {
+  def getProtocolFeeErgoContract(ctx: BlockchainContext): ErgoContract = {
     
     // Protocol fee contract hard-coded constants  
     val protocolFeeContractScript:      String                  =   GuapSwapProtocolFeeContract.getScript
     val jesperPK:                       ErgoValue[SigmaProp]    =   ErgoValue.of(Address.create(GuapSwapUtils.JESPER_PK).getPublicKey())
     val georgePK:                       ErgoValue[SigmaProp]    =   ErgoValue.of(Address.create(GuapSwapUtils.GEORGE_PK).getPublicKey())
     val lucaPK:                         ErgoValue[SigmaProp]    =   ErgoValue.of(Address.create(GuapSwapUtils.LUCA_PK).getPublicKey())
-    val threshold:                      ErgoValue[Long]         =   ErgoValue.of(GuapSwapUtils.THRESHOLD)
-    val feeSplitNum:                    ErgoValue[Long]         =   ErgoValue.of(GuapSwapUtils.FEE_SPLIT_NUM)
-    val feeSplitDenom:                  ErgoValue[Long]         =   ErgoValue.of(GuapSwapUtils.FEE_SPLIT_DENOM)
-    val GuapSwapMinerFee:               ErgoValue[Long]         =   ErgoValue.of(GuapSwapUtils.convertMinerFee(parameters.guapswapProtocolSettings.serviceFees.protocolMinerFee))
 
     // Protocol fee contract compiled ErgoContract
     val protocolFeeErgoContract: ErgoContract = ctx.compileContract(
@@ -364,10 +353,6 @@ object GuapSwapUtils {
             .item("JesperPK", jesperPK.getValue())
             .item("GeorgePK", georgePK.getValue())
             .item("LucaPK", lucaPK.getValue())
-            .item("THRESHOLD", threshold.getValue())
-            .item("FeeSplitNum", feeSplitNum.getValue())
-            .item("FeeSplitDenom", feeSplitDenom.getValue())
-            .item("GuapSwapMinerFee", GuapSwapMinerFee.getValue())
             .build(),
             protocolFeeContractScript
     )

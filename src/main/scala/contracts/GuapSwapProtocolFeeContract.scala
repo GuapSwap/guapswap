@@ -15,10 +15,10 @@ object GuapSwapProtocolFeeContract {
       // val JesperPK:          SigmaProp
       // val GeorgePK:          SigmaProp
       // val LucaPK:            SigmaProp
-      // val THRESHOLD:         Long
-      // val FeeSplitNum:       Long
-      // val FeeSplitDenom:     Long
-      // val GuapSwapMinerFee:  Long
+      val THRESHOLD:         Long = 1000000000.toLong // 1 ERG in nanoERG
+      val FeeSplitNum:       Long = 1.toLong          // Split total value fees     
+      val FeeSplitDenom:     Long = 3.toLong          // into equal thirds (1/3)
+      val GuapSwapMinerFee:  Long = 2000000.toLong    // 0.002 ERG in nanoERG
 
       // ===== GuapSwap Protocol Fee Contract Conditions ===== //
       val totalFees:  Long = INPUTS.fold(0L, {(acc: Long, input: Box) => acc + input.value})

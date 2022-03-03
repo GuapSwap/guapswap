@@ -18,6 +18,7 @@ import sigmastate.serialization.ErgoTreeSerializer
 import org.ergoplatform.appkit.Constants
 import sigmastate.interpreter.ErgoTreeEvaluator
 import org.ergoplatform.appkit.ErgoType
+import org.ergoplatform.restapi.client.SigmaBoolean
 
 /**
   * Class representing the parameters to be provided to the ErgoDexSwapSell contract.
@@ -148,7 +149,7 @@ object ErgoDexSwapSellParams {
     val const_18  = const_17.updated(18, Iso.isoEvaluatedValueToSConstant.to(Iso.isoErgoValueToSValue.to(swapsellparams.paramFeeNum)))
     val const_22  = const_18.updated(22, Iso.isoEvaluatedValueToSConstant.to(Iso.isoErgoValueToSValue.to(swapsellparams.paramMaxMinerFee)))
     val newConstants = const_22
-    val newConstantsWithoutPK = const_22.drop(0)
+    val newConstantsWithoutPK = const_22.updated(0, Iso.isoEvaluatedValueToSConstant.to(Iso.isoErgoValueToSValue.to(ErgoValue.of(Address.create(GuapSwapUtils.MAINNET_TEST_ADDRESS).asP2PK().pubkey))))
 
     // Substitute the constants 
     val newDexSwapSellContractSample: Values.SValue = ErgoTree.substConstants(dexSwapSellContractSample.root.right.get, newConstants)

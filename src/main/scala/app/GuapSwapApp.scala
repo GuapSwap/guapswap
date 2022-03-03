@@ -108,8 +108,7 @@ object GuapSwapApp extends CommandIOApp(
                     } else {
                         
                         // Print guapswap initiated status message
-                        println(Console.GREEN + "========== GUAPSWAP AUTOMATIC MODE INITIATED ==========" + Console.RESET)
-                        println(Console.BLUE + "========== Program will now run INDEFINITELY and will NOT ask for confirmation to SIGN the TX. To TERMINATE execution, please press the key combination 'CTRL + C'. ==========" + Console.RESET)
+                        println(Console.YELLOW + "========== GUAPSWAP AUTOMATIC MODE STARTED ==========" + Console.RESET)
                         GuapSwapInteractions.guapswapAutomatic(ergoClient, nodeConfig, parameters, proxyAddress, unlockedSecretStorage)
 
                     }
@@ -130,12 +129,16 @@ object GuapSwapApp extends CommandIOApp(
                     }
                     
                     // Print guapswap initiating status message
-                    println(Console.YELLOW + "========== GUAPSWAP REFUND INITIATED ==========" + Console.RESET)
-                    val refundTxId: String = GuapSwapInteractions.guapswapRefund(ergoClient: ErgoClient, nodeConfig: GuapSwapNodeConfig, parameters: GuapSwapParameters, proxyAddress: String, unlockedSecretStorage: SecretStorage)
+                    println(Console.YELLOW + "========== GUAPSWAP REFUND TX INITIATED ==========" + Console.RESET)
+                    val refundTxId: String = GuapSwapInteractions.guapswapRefund(ergoClient, nodeConfig, parameters, proxyAddress, unlockedSecretStorage)
 
                     // TODO: check if tx is even possible
                     // Print out guapswap initiated status message
-                    println(Console.GREEN + "========== GUAPSWAP REFUND SUCCEEDED ==========" + Console.RESET)
+                    println(Console.GREEN + "========== GUAPSWAP REFUND TX SUCCEEDED ==========" + Console.RESET)
+
+                    // Print out guapswap save tx status message
+                    println(Console.GREEN + "========== GUAPSWAP REFUND TX SAVED ==========" + Console.RESET)
+                    GuapSwapUtils.save(refundTxId, GuapSwapUtils.GUAPSWAP_REFUND_FILE_PATH)
                     
                     // Print tx link to user
                     println(Console.BLUE + "========== VIEW GUAPSWAP REFUND TX IN THE ERGO-EXPLORER WITH THE LINK BELOW ==========" + Console.RESET)
@@ -146,8 +149,15 @@ object GuapSwapApp extends CommandIOApp(
                 }
 
                 case GuapSwapCli.List(proxyAddress) => {
-                    println(s"list boxes at address: ${proxyAddress}")
                     
+                    println(Console.YELLOW + "========== GUAPSWAP LIST INITIATED ==========" + Console.RESET)
+                    println(Console.YELLOW + "========== LISTING ALL PROXY BOXES WITH THE GIVEN ADDRESS ==========" + Console.RESET)
+
+                    // List boxes at the proxy addres
+                    GuapSwapInteractions.guapswapList(ergoClient, proxyAddress)
+                    
+                    println(Console.GREEN + "========== LISTING COMPLETE ==========" + Console.RESET)
+
                     // Return successful exit code
                     IO(ExitCode.Success)
                 }

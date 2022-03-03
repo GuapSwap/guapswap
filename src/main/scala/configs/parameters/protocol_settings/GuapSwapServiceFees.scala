@@ -10,7 +10,7 @@ import protocol.GuapSwapUtils
   * @param minerFee
   */
 case class GuapSwapServiceFees(
-    val protocolFeePercentage: Double = GuapSwapUtils.DEFAULT_PROTOCOL_FEE_PERCENTAGE,
-    val protocolUIFeePercentage: Double = GuapSwapUtils.DEFAULT_PROTOCOL_UI_FEE_PERCENTAGE,
-    val protocolMinerFee: Double = GuapSwapUtils.DEFAULT_PROTOCOL_MINER_FEE
+    val protocolFeePercentage: Double,
+    val protocolUIFeePercentage: Double,
+    val protocolMinerFee: Double
 )
