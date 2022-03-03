@@ -1,11 +1,13 @@
 # guapswap
 GuapSwap CLI for the everyday Ergo miner.
 
-### KYA
+## KYA
 
 1. Use at your own risk.
 2. Your funds could be lost and stuck in smart-contract limbo until the heat-death of the Universe, please only spend what you are willing to lose.
 3. We are not responsible for anything **bad** that happens to you while using this program, please go complain to your mommy instead.
+
+## Usage
 
 ### Usage Steps
 
@@ -33,9 +35,9 @@ GuapSwap CLI for the everyday Ergo miner.
 5. "Erdoge"
 6. "LunaDog"
 
-### Pool Compatibility
+## Pool Compatibility
 
-**Known compatible pools**
+### Known compatible pools
 
 - getblok.io
 - nanopool.org
@@ -46,7 +48,7 @@ GuapSwap CLI for the everyday Ergo miner.
 - rkdn.app
 - solopool.org
 
-**Known incompatible pools (do not accept proxy address)**
+### Known incompatible pools (do not accept proxy address)
 
 - flypool.org
 - 2miners.com
