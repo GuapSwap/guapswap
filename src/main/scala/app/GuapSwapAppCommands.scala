@@ -10,7 +10,6 @@ import scala.collection.JavaConverters._
 import org.ergoplatform.{ErgoAddress, Pay2SAddress, P2PKAddress}
 import org.ergoplatform.appkit._
 
-import configs.node.GuapSwapNodeConfig
 import configs.parameters.GuapSwapParameters
 import contracts.{GuapSwapDexSwapSellProxyContract, GuapSwapProtocolFeeContract}
 import dex.ergodex.{ErgoDexUtils, ErgoDexSwap, ErgoDexSwapSellParams}
@@ -151,13 +150,12 @@ object GuapSwapAppCommands {
           * Perform a onetime swap.
           *
           * @param ergoClient
-          * @param nodeConfig
           * @param parameters
           * @param proxyAddress
           * @param unlockedSecretStorage
           * @return Onetime GuapSwap transaction ID string.
           */
-        def guapswapOneTime(ergoClient: ErgoClient, nodeConfig: GuapSwapNodeConfig, parameters: GuapSwapParameters, proxyAddress: String, unlockedSecretStorage: SecretStorage): String = {
+        def guapswapOneTime(ergoClient: ErgoClient, parameters: GuapSwapParameters, proxyAddress: String, unlockedSecretStorage: SecretStorage): String = {
             
             // TODO: Check the parameters to make sure it corresponds to the appropriate DEX
             // Get the dex proxy script
@@ -277,12 +275,11 @@ object GuapSwapAppCommands {
           * Launch the automatic swap
           *
           * @param ergoClient
-          * @param nodeConfig
           * @param parameters
           * @param proxyAddress
           * @param unlockedSecretStorage
           */
-        def guapswapAutomatic(ergoClient: ErgoClient, nodeConfig: GuapSwapNodeConfig, parameters: GuapSwapParameters, proxyAddress: String, unlockedSecretStorage: SecretStorage): Unit = {
+        def guapswapAutomatic(ergoClient: ErgoClient, parameters: GuapSwapParameters, proxyAddress: String, unlockedSecretStorage: SecretStorage): Unit = {
             
             // Print notification statement
             println(Console.BLUE + "========== Program will run INDEFINITELY and will NOT ask for confirmation to SIGN the TX. To TERMINATE execution, close the terminal session. ==========" + Console.RESET)
@@ -306,7 +303,7 @@ object GuapSwapAppCommands {
                 try {
                     // Print guapswap automatic initiated status message
                     println(Console.YELLOW + "========== GUAPSWAP AUTOMATIC TX INITIATED ==========" + Console.RESET)
-                    val automaticSwapTxId: String = GuapSwapAppCommands.GuapSwapInteractions.guapswapOneTime(ergoClient, nodeConfig, parameters, proxyAddress, unlockedSecretStorage)
+                    val automaticSwapTxId: String = guapswapOneTime(ergoClient, parameters, proxyAddress, unlockedSecretStorage)
 
                     // Perform a swap
                     println(Console.GREEN + "========== GUAPSWAP AUTOMATIC TX SUCCESSFULL ==========" + Console.RESET)
@@ -337,13 +334,12 @@ object GuapSwapAppCommands {
           * Refund transaction.
           *
           * @param ergoClient
-          * @param nodeConfig
           * @param parameters
           * @param proxyAddress
           * @param unlockedSecretStorage
           * @return Refund transaction ID string.
           */
-        def guapswapRefund(ergoClient: ErgoClient, nodeConfig: GuapSwapNodeConfig, parameters: GuapSwapParameters, proxyAddress: String, unlockedSecretStorage: SecretStorage): String = {
+        def guapswapRefund(ergoClient: ErgoClient, parameters: GuapSwapParameters, proxyAddress: String, unlockedSecretStorage: SecretStorage): String = {
             
             // Generate blockchain context
             val refundTxId: String = ergoClient.execute((ctx: BlockchainContext) => {

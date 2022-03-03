@@ -18,7 +18,7 @@ lazy val root = project
     "org.typelevel" %% "cats-kernel" % VersionScheme.Always
     ),
 
-    assembly / assemblyJarName := s"guapswap-${version.value}.jar",
-    assembly / assemblyOutputPath := file(s"./guapswap-${version.value}.jar/")
+    assembly / assemblyJarName := s"${name.value}-${version.value}.jar",
+    assembly / assemblyOutputPath := file(s"./${name.value}-${version.value}.jar/")
 
   )
