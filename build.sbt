@@ -3,7 +3,7 @@ lazy val root = project
   .settings(
     name := "guapswap",
 
-    version := "0.1.0-beta",
+    version := "1.0.0-beta",
 
     scalaVersion := "2.12.15",
 

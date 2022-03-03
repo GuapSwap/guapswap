@@ -13,7 +13,7 @@
     },
     "parameters": {
         "guapswapProtocolSettings": {
-            "userAddress": "9fSek6bWQ2yusFHyJARD95KPTCrn5rfEav6msGZpxQZQvcBADQ9",
+            "userAddress": "",
             "serviceFees": {
                 "protocolFeePercentage": 0.0025,
                 "protocolUIFeePercentage": 0.0,
