@@ -418,7 +418,8 @@ object GuapSwapAppCommands {
                     proxyBoxes.foreach(proxy => println(proxy.toJson(true)))
 
                 } catch {
-                    case e: Throwable =>  println(Console.RED + "========== NO PROXY BOXES AT THE GIVEN ADDRESS FOUND ==========" + Console.RESET)
+                    case noNodeConnect: ErgoClientException => noNodeConnect 
+                    case noIndex: IndexOutOfBoundsException =>  println(Console.RED + "========== NO PROXY BOXES AT THE GIVEN ADDRESS FOUND ==========" + Console.RESET)
                 }
             
             })
