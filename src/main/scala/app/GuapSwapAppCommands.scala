@@ -350,7 +350,6 @@ object GuapSwapAppCommands {
                 // Search for all the proxy boxes => assumes a max payout of 1/hr for one week (i.e. 168 maxmimum boxes)
                 val proxyBoxes:                     List[InputBox]          =   ctx.getUnspentBoxesFor(proxyContractAddress, 0, 168).asScala.toList
                 val totalPayout:                    Long                    =   proxyBoxes.foldLeft(0L)((acc, proxybox) => acc + proxybox.getValue())
-                val inputs:                         ju.List[InputBox]       =   seqAsJavaList(proxyBoxes)
                 val guapSwapMinerFee:               Long                    =   GuapSwapUtils.convertMinerFee(parameters.guapswapProtocolSettings.serviceFees.protocolMinerFee)
                 val refundValue:                    Long                    =   totalPayout - guapSwapMinerFee
                 val contextVarCheckFail:            ErgoValue[Long]         =   GuapSwapUtils.CONTEXT_VAR_CHECK_FAIL 
