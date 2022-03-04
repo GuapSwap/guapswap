@@ -317,9 +317,8 @@ object GuapSwapAppCommands {
                     println(GuapSwapUtils.ERGO_EXPLORER_TX_URL_PREFIX + automaticSwapTxId)
 
                 } catch {
-                    case e: Throwable => {
-                        println(Console.RED + "========== NO VALID PROXY BOX FOUND FOR THE AUTOMATIC SWAP TX ==========" + Console.RESET)
-                    }
+                    case noProxyBoxes: IndexOutOfBoundsException => println(Console.RED + "========== NO VALID PROXY BOX FOUND FOR THE AUTOMATIC SWAP TX ==========" + Console.RESET)
+                    case error: Throwable => error
                 }
             
                 // Print warning and put the thread to sleep for the alloted interval of time

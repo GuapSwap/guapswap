@@ -34,6 +34,7 @@ object ErgoDexUtils {
         "SigUSD"  -> GuapSwapUtils.validErgoAssets.get("SigUSD").get,
         "SigRSV"  -> GuapSwapUtils.validErgoAssets.get("SigRSV").get,
         "NETA"    -> GuapSwapUtils.validErgoAssets.get("NETA").get,
+        "ergopad" -> GuapSwapUtils.validErgoAssets.get("ergopad").get,
         "Erdoge"  -> GuapSwapUtils.validErgoAssets.get("Erdoge").get,
         "LunaDog" -> GuapSwapUtils.validErgoAssets.get("LunaDog").get
     )
