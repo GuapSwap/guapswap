@@ -3,8 +3,10 @@ package configs.parameters.protocol_settings
 /**
   * Class reresenting the protocol settings.
   * 
-  * @param minderAddress
+  * @param userAddress
   * @param serviceFees
+  * @param swapIntervalInHours
+  * @param dexChoice
   */
 case class GuapSwapProtocolSettings(
     val userAddress: String,

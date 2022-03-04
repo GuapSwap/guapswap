@@ -6,8 +6,8 @@ import protocol.GuapSwapUtils
   * Class representing the protocol service fees.
   *
   * @param protocolFeePercentage
-  * @param uiFeePercentage
-  * @param minerFee
+  * @param protocolUIFeePercentage
+  * @param protocolMinerFee
   */
 case class GuapSwapServiceFees(
     val protocolFeePercentage: Double,

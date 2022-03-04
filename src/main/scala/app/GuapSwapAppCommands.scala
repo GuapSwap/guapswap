@@ -174,6 +174,8 @@ object GuapSwapAppCommands {
             val poolSearchName: String = ticker match {
                 case "SigUSD"  => "ERG_2_SigUSD"
                 case "SigRSV"  => "ERG_2_SigRSV"
+                case "NETA"    => "ERG_2_NETA"
+                case "ergopad" => "ERG_2_ergopad"
                 case "Erdoge"  => "ERG_2_Erdoge"
                 case "LunaDog" => "ERG_2_LunaDog"
             }
@@ -200,7 +202,6 @@ object GuapSwapAppCommands {
                 
                 // Search for all the proxy boxes 
                 val proxyBoxes: List[InputBox] = ctx.getUnspentBoxesFor(proxyContractAddress, 0, 50).asScala.toList
-                proxyBoxes.foreach(proxy => println(proxy))
                 val totalPayout: Long = proxyBoxes.foldLeft(0L)((acc, proxybox) => acc + proxybox.getValue())
 
                 // Generate the swap sell parameters
@@ -317,7 +318,7 @@ object GuapSwapAppCommands {
                     println(GuapSwapUtils.ERGO_EXPLORER_TX_URL_PREFIX + automaticSwapTxId)
 
                 } catch {
-                    case noProxyBoxes: IndexOutOfBoundsException => println(Console.RED + "========== NO VALID PROXY BOX FOUND FOR THE AUTOMATIC SWAP TX ==========" + Console.RESET)
+                    case noProxyBoxes: IndexOutOfBoundsException => println(Console.RED + "========== NO VALID PROXY BOXES FOUND FOR THE AUTOMATIC SWAP TX ==========" + Console.RESET)
                     case error: Throwable => error
                 }
             
@@ -399,6 +400,12 @@ object GuapSwapAppCommands {
             refundTxId.replaceAll("\"", "")
         }
 
+        /**
+          * List boxes at the given GuapSwap proxy contract address.
+          * 
+          * @param ergoClient
+          * @param proxyAddress
+          */
         def guapswapList(ergoClient: ErgoClient, proxyAddress: String): Unit = {
 
             // Generate the blockchain context

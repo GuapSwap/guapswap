@@ -22,7 +22,7 @@ object GuapSwapProtocolFeeContract {
 
       // ===== GuapSwap Protocol Fee Contract Conditions ===== //
       val totalFees:  Long = INPUTS.fold(0L, {(acc: Long, input: Box) => acc + input.value})
-      val splitValue: Long = (FeeSplitNum * totalFees) / FeeSplitDenom
+      val splitValue: Long = (FeeSplitNum * (totalFees - GuapSwapMinerFee)) / FeeSplitDenom
 
       // Check that a valid Jesper Fee Withdrawal Box is created.
       val validJesperFeeWithdrawalBox = {
@@ -51,24 +51,13 @@ object GuapSwapProtocolFeeContract {
         ))
       }
 
-      // Check that a valid Group Protocol Fee Box is created.
-      val validGroupProtocolFeeBox = {
-        val feeBox = OUTPUTS(3)
-        allOf(Coll(
-        (feeBox.value >= totalFees - (3 * splitValue) - GuapSwapMinerFee), 
-        (SELF.propositionBytes == feeBox.propositionBytes)
-        ))
-      }
-
       // Check that a valid group fee withdrawal is initiated
       val validGroupFeeWithdrawal = {
         allOf(Coll(
         validJesperFeeWithdrawalBox, 
         validGeorgeFeeWithdrawalBox, 
         validLucaFeeWithdrawalBox, 
-        validGroupProtocolFeeBox, 
         (totalFees >= THRESHOLD), 
-        (OUTPUTS.size == 5)
         ))
       }
 
