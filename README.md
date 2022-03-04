@@ -27,7 +27,7 @@ GuapSwap CLI for the everyday Ergo miner.
 3. `refund <proxy_address>`
 4. `list <proxy_address>`
 
-### Available Token Tickers
+### Available Swap Token Tickers
 1. "SigUSD"
 2. "SigRSV"
 3. "NETA"
