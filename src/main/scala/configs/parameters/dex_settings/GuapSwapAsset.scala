@@ -1,18 +1,18 @@
 package configs.parameters.dex_settings
 
-import dex.ergodex.ErgoDexUtils
-
 /**
-  * Class representing the ErgoDex settings.
+  * Class representing a dex swap asset with corresponding settings.
   *
   * @param swapAssetTicker
   * @param slippageTolerancePercentage
   * @param nitro
-  * @param minerFee
+  * @param dexMinerFee
+  * @param percentageOfPayout
   */
-case class GuapSwapErgoDexSettings(
+case class GuapSwapAsset(
     val swapAssetTicker: String,
     val slippageTolerancePercentage: Double,
     val nitro: Double,
-    val ergodexMinerFee: Double
+    val dexMinerFee: Double,
+    val percentageOfPayout: Double
 )
