@@ -10,9 +10,9 @@ package configs.parameters.dex_settings
   * @param percentageOfPayout
   */
 case class GuapSwapAsset(
-    val swapAssetTicker: String,
-    val slippageTolerancePercentage: Double,
-    val nitro: Double,
-    val dexMinerFee: Double,
-    val percentageOfPayout: Double
+  val swapAssetTicker: String,
+  val slippageTolerancePercentage: Double,
+  val nitro: Double,
+  val dexMinerFee: Double,
+  val percentageOfPayout: Double
 )

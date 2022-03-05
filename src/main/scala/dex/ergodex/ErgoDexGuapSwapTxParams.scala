@@ -14,6 +14,6 @@ case class ErgoDexGuapSwapTxParams(
     val inputs: List[InputBox],
     val outputs: List[DexPool],
     val ratios: List[(Long, Long)],
-    val params: List[ErgoDexSwapSellParams],
+    val swapSellParams: List[ErgoDexSwapSellParams],
     val ergoTrees: List[ErgoValue[Coll[Byte]]]
 )

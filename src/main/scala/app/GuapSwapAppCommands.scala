@@ -157,6 +157,19 @@ object GuapSwapAppCommands {
           */
         def guapswapOneTime(ergoClient: ErgoClient, parameters: GuapSwapParameters, proxyAddress: String, unlockedSecretStorage: SecretStorage): String = {
             
+
+            // get abstract transaction type
+            val guapswapTx: GuapSwapTx = GuapSwapTx.getAbstractGuapSwapTx(ergoClient, parameters, proxyAddress)
+            // determine which transaction to pick
+
+            // perform picked transaction
+                
+                // get parameters
+                // get context variables
+                // contstruct transaction
+                // sign transaction
+            
+            // return tx id
             // TODO: Check the parameters to make sure it corresponds to the appropriate DEX
             // Get the dex proxy script
             val swapSellSellProxyScript: String = GuapSwapDexSwapSellProxyContract.getScript
