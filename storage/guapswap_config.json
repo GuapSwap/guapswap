@@ -19,7 +19,7 @@
                 "protocolUIFeePercentage": 0.0,
                 "protocolMinerFee": 0.005
             },
-            "swapIntervalInHours": "1",
+            "swapIntervalInHours": 1,
             "dexChoice": "ERGODEX"
         },
         "dexSettings": {
