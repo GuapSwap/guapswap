@@ -7,8 +7,8 @@ package configs.parameters.dex_settings
   * @param swapAsset2
   * @param swapAsset3
   */
-case class GuapSwapAssets(
-  val swapAsset1: GuapSwapAsset,
-  val swapAsset2: GuapSwapAsset,
-  val swapAsset3: GuapSwapAsset
+case class GuapSwapDexAssets(
+  val swapAsset1: GuapSwapDexAsset,
+  val swapAsset2: GuapSwapDexAsset,
+  val swapAsset3: GuapSwapDexAsset
 )

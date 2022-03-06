@@ -9,7 +9,7 @@ package configs.parameters.dex_settings
   * @param dexMinerFee
   * @param percentageOfPayout
   */
-case class GuapSwapAsset(
+case class GuapSwapDexAsset(
   val swapAssetTicker: String,
   val slippageTolerancePercentage: Double,
   val nitro: Double,

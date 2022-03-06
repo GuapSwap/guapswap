@@ -9,5 +9,5 @@ package configs.parameters.dex_settings
   * @param minerFee
   */
 case class GuapSwapErgoDexSettings(
-  val swapAssets: GuapSwapAssets
+  val swapAssets: GuapSwapDexAssets
 )

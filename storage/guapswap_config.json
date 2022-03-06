@@ -30,21 +30,21 @@
                         "slippageTolerancePercentage": 3,
                         "nitro": 1.2,
                         "dexMinerFee": 0.002,
-                        "percentageOfPayout": ".8"
+                        "percentageOfPayout": 0.8
                     },
                     "swapAsset2": {
                         "swapAssetTicker": "NETA",
                         "slippageTolerancePercentage": 3,
                         "nitro": 1.2,
                         "dexMinerFee": 0.002,
-                        "percentageOfPayout": ".2"
+                        "percentageOfPayout": 0.2
                     },
                     "swapAsset3": {
                         "swapAssetTicker": "ergopad",
                         "slippageTolerancePercentage": 3,
                         "nitro": 1.2,
                         "dexMinerFee": 0.002,
-                        "percentageOfPayout": ".2"
+                        "percentageOfPayout": 0.0
                     }
                 }
             }

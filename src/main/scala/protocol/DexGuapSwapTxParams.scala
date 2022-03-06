@@ -10,7 +10,7 @@ import org.ergoplatform.appkit.InputBox
   *
   * @param inputs
   */
-case class ErgoDexGuapSwapTxParams(
+case class DexGuapSwapTxParams(
     val inputs: List[InputBox],
     val outputs: List[DexPool],
     val ratios: List[(Long, Long)],
