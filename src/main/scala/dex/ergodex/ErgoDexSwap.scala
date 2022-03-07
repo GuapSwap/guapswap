@@ -53,8 +53,8 @@ object ErgoDexSwap {
       * @param minOutputAmount
       * @return Tuple containing the swam extremums.
       */
-    def swapExtremums(minExecutionFee: Long, nitro: Double, minOutputAmount: Long): (Long, (Long, Long, Long, Long)) = {
-        val exFeePerToken: Long = minExecutionFee / minOutputAmount 
+    def swapExtremums(minExecutionFee: Long, nitro: Double, minOutputAmount: Long): (Double, (Long, Long, Long, Long)) = {
+        val exFeePerToken: Double = minExecutionFee.toDouble / minOutputAmount.toDouble
         val adjustedMinExecutionFee: Double = Math.floor(exFeePerToken * minOutputAmount)
         val maxExecutionFee: Double = Math.floor(minExecutionFee * nitro)
         val maxOutputAmount: Double = Math.floor(maxExecutionFee / exFeePerToken)

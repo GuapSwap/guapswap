@@ -98,7 +98,7 @@ object ErgoDexSwapSellParams {
     val minQuoteAmount: Long = ErgoDexSwap.calculateMinOutputAmount(baseAmount, ergodexSettings.slippageTolerancePercentage, xAmount, yAmount, poolFeeNum, ErgoDexUtils.POOL_FEE_DENOM)
 
     // Calculate the swap extremum values
-    val swapExtemums: (Long, (Long, Long, Long, Long)) = ErgoDexSwap.swapExtremums(ergodexMinExecutionFee, ergodexSettings.nitro, minQuoteAmount)
+    val swapExtemums: (Double, (Long, Long, Long, Long)) = ErgoDexSwap.swapExtremums(ergodexMinExecutionFee, ergodexSettings.nitro, minQuoteAmount)
 
     // Calculate execution fee numerator and denominator
     val dexFeePerTokenFraction: (Long, Long) = GuapSwapUtils.decimalToFraction(swapExtemums._1)

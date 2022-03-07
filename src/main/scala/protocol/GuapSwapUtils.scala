@@ -362,6 +362,25 @@ object GuapSwapUtils {
   }
 
   /**
+    * Get a time-zone timestamp.
+    *
+    * @param zone
+    * @return A time-zone timestamp, with date and time.
+    */
+  def getTimeStamp(zone: String): String = {
+
+    // Get the date and time in UTC format
+    val dateTime: LocalDateTime = LocalDateTime.now(ZoneId.of(zone))
+
+    // Format the time string 
+    val date: String = dateTime.toString().split("[T]")(0)
+    val time: String = dateTime.toString().split("[T]")(1).split("\\.")(0)
+    val timestamp: String = s"[${zone} ${date} ${time}]"
+    
+    timestamp
+  }
+
+  /**
     * Save string to file log, with date and time in UTC.
     *
     * @param string
@@ -372,16 +391,12 @@ object GuapSwapUtils {
     // Get access to the file
     val file: FileWriter = new FileWriter(path, true)
 
-    // Get the date and time in UTC format
-    val dateTime: LocalDateTime = LocalDateTime.now(ZoneId.of("UTC"))
-
-    // Format the time string 
-    val date: String = dateTime.toString().split("[T]")(0)
-    val time: String = dateTime.toString().split("[T]")(1).split("\\.")(0)
+    // Get the timestamp
+    val utcTimeStamp: String = getTimeStamp("UTC")
 
     // Append text to file
     file.append(System.lineSeparator())
-    file.append(s"[UTC ${date} ${time}] ${string}")
+    file.append(s"${utcTimeStamp} ${string}")
 
     // Close the file and io-stream
     file.close()  
