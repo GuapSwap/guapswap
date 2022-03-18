@@ -310,6 +310,7 @@ case object GuapSwapTx {
     * @return Tuple of the payout percentage ratios.
     */
   private def getRatios(parameters: GuapSwapParameters): (Double, Double, Double) = {
+    
     val x: Double = parameters.dexSettings.ergodexSettings.swapAssets.swapAsset1.percentageOfPayout
     val y: Double = parameters.dexSettings.ergodexSettings.swapAssets.swapAsset2.percentageOfPayout
     val z: Double = parameters.dexSettings.ergodexSettings.swapAssets.swapAsset3.percentageOfPayout
@@ -354,11 +355,11 @@ case object GuapSwapTx {
     val y: Double = ratios._2
     val z: Double = ratios._3
 
-    if (x == 1 && y == 0 && z == 0) {
+    if (x == 1.0 && y == 0.0 && z == 0.0) {
       1
-    } else if (x > 0 && y > 0 && z == 0 && x + y == 1) {
+    } else if (x > 0.0 && y > 0.0 && z == 0.0 && x + y == 1.0) {
       2
-    } else if (x > 0 && y > 0 && z > 0 && x + y + z == 1) {
+    } else if (x > 0.0 && y > 0.0 && z > 0.0 && x + y + z == 1.0) {
       3
     } else {
       throw new IllegalArgumentException("Invalid token settings in config file.")
