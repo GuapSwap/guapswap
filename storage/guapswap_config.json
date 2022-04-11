@@ -19,32 +19,47 @@
                 "protocolUIFeePercentage": 0.0,
                 "protocolMinerFee": 0.002
             },
-            "swapIntervalInHours": "1",
-            "dexChoice": "ERGODEX"
+            "swapIntervalInHours": "1"
         },
-        "dexSettings": {
-            "ergodexSettings": {
-                "swapAssets": {
-                    "swapAsset1": {
-                        "swapAssetTicker": "SigUSD",
-                        "slippageTolerancePercentage": 3,
-                        "nitro": 1.2,
-                        "dexMinerFee": 0.002,
-                        "percentageOfPayout": 0.8
-                    },
-                    "swapAsset2": {
-                        "swapAssetTicker": "NETA",
-                        "slippageTolerancePercentage": 3,
-                        "nitro": 1.2,
-                        "dexMinerFee": 0.002,
-                        "percentageOfPayout": 0.2
-                    },
-                    "swapAsset3": {
-                        "swapAssetTicker": "ergopad",
-                        "slippageTolerancePercentage": 3,
-                        "nitro": 1.2,
-                        "dexMinerFee": 0.002,
-                        "percentageOfPayout": 0.0
+        "swapAssetSettings": {
+            "swapAssets": {
+                "swapAsset1": {
+                    "swapAssetTicker": "SigUSD",
+                    "percentageOfPayout": 0.8,
+                    "recipientAddress": "",
+                    "dexSettings": {
+                        "dexChoice": "ErgoDex",
+                        "ergoDexSettings": {
+                            "slippageTolerancePercentage": 3,
+                            "nitro": 1.2,
+                            "dexMinerFee": 0.002
+                        }
+                    }
+                },
+                "swapAsset2": {
+                    "swapAssetTicker": "NETA",
+                    "percentageOfPayout": 0.2,
+                    "recipientAddress": "",
+                    "dexSettings": {
+                        "dexChoice": "ErgoDex",
+                        "ergoDexSettings": {
+                            "slippageTolerancePercentage": 3,
+                            "nitro": 1.2,
+                            "dexMinerFee": 0.002
+                        }
+                    }
+                },
+                "swapAsset3": {
+                    "swapAssetTicker": "ergopad",
+                    "percentageOfPayout": 0.2,
+                    "recipientAddress": "",
+                    "dexSettings": {
+                        "dexChoice": "ErgoDex",
+                        "ergoDexSettings": {
+                            "slippageTolerancePercentage": 3,
+                            "nitro": 1.2,
+                            "dexMinerFee": 0.002
+                        }
                     }
                 }
             }
