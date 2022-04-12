@@ -3,13 +3,13 @@ lazy val root = project
   .settings(
     name := "guapswap",
 
-    version := "1.0.1-beta",
+    version := "1.1.0-beta",
 
     scalaVersion := "2.12.15",
 
     libraryDependencies ++= Seq(
       "org.scalatest" %% "scalatest" % "3.2.9" % Test,
-      "org.ergoplatform" %% "ergo-appkit" % "4.0.7",
+      "org.ergoplatform" %% "ergo-appkit" % "4.0.8",
       "com.google.code.gson" % "gson" % "2.8.5",
       "com.monovore" %% "decline-effect" % "2.2.0"
     ),

@@ -35,6 +35,8 @@ object ErgoDexUtils {
         "SigRSV"  -> GuapSwapUtils.validErgoAssets.get("SigRSV").get,
         "NETA"    -> GuapSwapUtils.validErgoAssets.get("NETA").get,
         "ergopad" -> GuapSwapUtils.validErgoAssets.get("ergopad").get,
+        "Paideia" -> GuapSwapUtils.validErgoAssets.get("Paideia").get,
+        "COMET"   -> GuapSwapUtils.validErgoAssets.get("COMET").get,
         "Erdoge"  -> GuapSwapUtils.validErgoAssets.get("Erdoge").get,
         "LunaDog" -> GuapSwapUtils.validErgoAssets.get("LunaDog").get
     )
@@ -61,6 +63,16 @@ object ErgoDexUtils {
           assetX = validErgoDexAssets.get("ERG").get,
           assetY = validErgoDexAssets.get("ergopad").get
         ),
+        "ERG_2_Paideia" -> DexPool(
+          poolId = "9916d75132593c8b07fe18bd8d583bda1652eed7565cf41a4738ddd90fc992ec",
+          assetX = validErgoDexAssets.get("ERG").get,
+          assetY = validErgoDexAssets.get("Paideia").get
+        ),
+        "ERG_2_COMET" -> DexPool(
+          poolId = "1f01dc8e29806d96ca0b79f8e798cd8cfce51c0e676aaedf6ab3464b37da9dfd",
+          assetX = validErgoDexAssets.get("ERG").get,
+          assetY = validErgoDexAssets.get("COMET"),get
+        ), 
         "ERG_2_Erdoge" -> DexPool(
           poolId = "3d4fdb931917647f4755ada29d13247686df84bd8aea060d22584081bd11ba69",
           assetX = validErgoDexAssets.get("ERG").get,

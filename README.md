@@ -1,5 +1,5 @@
 # guapswap
-GuapSwap CLI for the everyday Ergo miner.
+GuapSwap CLI for the Ergo miner.
 
 ## KYA
 

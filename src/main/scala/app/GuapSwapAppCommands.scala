@@ -200,7 +200,7 @@ object GuapSwapAppCommands {
                     poolBoxes = ctx.getUnspentBoxesFor(poolContractAddress, 0, 20).asScala.toList
                 } catch {
                     case exception: IllegalArgumentException => {
-                        println("No ErgoDex pool boxes exist.")
+                        println(GuapSwapUtils.getTimeStamp("UTC") + " " + "No ErgoDex pool boxes exist.")
                         throw exception
                     }
                 }
@@ -296,7 +296,7 @@ object GuapSwapAppCommands {
         def guapswapAutomatic(ergoClient: ErgoClient, nodeConfig: GuapSwapNodeConfig, parameters: GuapSwapParameters, proxyAddress: String, unlockedSecretStorage: SecretStorage): Unit = {
             
             // Print notification statement
-            println(Console.BLUE + "========== Program will run INDEFINITELY and will NOT ask for confirmation to SIGN the TX. To TERMINATE execution, close the terminal session. ==========" + Console.RESET)
+            println(Console.BLUE + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== Program will run INDEFINITELY and will NOT ask for confirmation to SIGN the TX. To TERMINATE execution, close the terminal session. ==========" + Console.RESET)
 
             // Convert swap interval into milliseconds
             val milliSecondsPerMinute: Long = 1000 * 60
@@ -316,27 +316,27 @@ object GuapSwapAppCommands {
 
                 try {
                     // Print guapswap automatic initiated status message
-                    println(Console.YELLOW + "========== GUAPSWAP AUTOMATIC TX INITIATED ==========" + Console.RESET)
+                    println(Console.YELLOW + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== GUAPSWAP AUTOMATIC TX INITIATED ==========" + Console.RESET)
                     val automaticSwapTxId: String = guapswapOneTime(ergoClient, nodeConfig, parameters, proxyAddress, unlockedSecretStorage)
 
                     // Perform a swap
-                    println(Console.GREEN + "========== GUAPSWAP AUTOMATIC TX SUCCESSFULL ==========" + Console.RESET)
+                    println(Console.GREEN + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== GUAPSWAP AUTOMATIC TX SUCCESSFULL ==========" + Console.RESET)
 
                     // Print out guapswap save tx status message
-                    println(Console.GREEN + "========== GUAPSWAP AUTOMATIC TX SAVED ==========" + Console.RESET)
+                    println(Console.GREEN + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== GUAPSWAP AUTOMATIC TX SAVED ==========" + Console.RESET)
                     GuapSwapUtils.save(automaticSwapTxId, GuapSwapUtils.GUAPSWAP_SWAP_FILE_PATH)
                             
                     // Print tx link to the user
-                    println(Console.BLUE + "========== VIEW GUAPSWAP AUTOMATIC TX IN THE ERGO-EXPLORER WITH THE LINK BELOW ==========" + Console.RESET)
-                    println(GuapSwapUtils.getTimeStamp("UTC") + " " + GuapSwapUtils.ERGO_EXPLORER_TX_URL_PREFIX + automaticSwapTxId)
+                    println(Console.BLUE + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== VIEW GUAPSWAP AUTOMATIC TX IN THE ERGO-EXPLORER WITH THE LINK BELOW ==========" + Console.RESET)
+                    println(GuapSwapUtils.ERGO_EXPLORER_TX_URL_PREFIX + automaticSwapTxId)
 
                 } catch {
-                    case noProxyBoxes: IndexOutOfBoundsException => println(Console.RED + "========== INVALID INPUTS, CHECK CONFIG FILE OR PROXY BOX ==========" + Console.RESET)
+                    case noProxyBoxes: IndexOutOfBoundsException => println(Console.RED + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== INVALID INPUTS, CHECK CONFIG FILE OR PROXY BOX ==========" + Console.RESET)
                     case error: Throwable => error
                 }
             
                 // Print warning and put the thread to sleep for the alloted interval of time
-                println(Console.BLUE + s"========== AUTOMATIC TX ATTEMPT WILL OCCUR AGAIN WITHIN THE NEXT ${minutes} MINUTES ==========" + Console.RESET)
+                println(Console.BLUE + GuapSwapUtils.getTimeStamp("UTC") + " " + s"========== AUTOMATIC TX ATTEMPT WILL OCCUR AGAIN WITHIN THE NEXT ${minutes} MINUTES ==========" + Console.RESET)
                 Thread.sleep(time)
             }   
 
@@ -439,11 +439,13 @@ object GuapSwapAppCommands {
                     val proxyBoxes: List[InputBox] = ctx.getUnspentBoxesFor(proxyContractAddress, 0, 168).asScala.toList
                 
                     // Print the proxy boxes
+                    println(GuapSwapUtils.getTimeStamp("UTC") + " " + "START")
                     proxyBoxes.foreach(proxy => println(proxy.toJson(true)))
+                    println(GuapSwapUtils.getTimeStamp("UTC") + " " + "END")
 
                 } catch {
                     case noNodeConnect: ErgoClientException => noNodeConnect 
-                    case noIndex: IndexOutOfBoundsException =>  println(Console.RED + "========== NO PROXY BOXES AT THE GIVEN ADDRESS FOUND ==========" + Console.RESET)
+                    case noIndex: IndexOutOfBoundsException =>  println(Console.RED + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== NO PROXY BOXES AT THE GIVEN ADDRESS FOUND ==========" + Console.RESET)
                 }
             
             })

@@ -42,8 +42,12 @@ object GuapSwapUtils {
   final val DEFAULT_ERGOPLATFORM_MAINNET_API_URL: String = "http://213.239.193.208:9053/"
   final val DEFAULT_ERGOPLATFORM_TESTNET_API_URL: String = "http://213.239.193.208:9052/"
 
+  // Default local node URL
+  final val DEFAULT_LOCAL_NODE_MAINNET_API_URL: String = "http://127.0.0.1:9053/"
+  final val DEFAULT_LOCAL_NODE_TESTNET_API_URL: String = "http://127.0.0.1:9052/"
+
   // Default GetBlok TESTNET node URL
-  final val DEFAULT_GETBLOK_TESTNET_STRATUM_URL: String = "http://ergo-testnet.getblok.io:3056"
+  final val DEFAULT_GETBLOK_TESTNET_STRATUM_URL: String = "http://ergo-testnet.getblok.io:3056/"
   final val DEFAULT_GETBLOK_TESTNET_API_URL: String = "http://ergo-node-devnet.getblok.io:9052/"
   
   // Default secret storage directory
@@ -70,11 +74,13 @@ object GuapSwapUtils {
 
   // HashMap of possible Ergo Assets
   final val validErgoAssets: HashMap[String, DexAsset] = HashMap(
-    "ERG"     -> DexAsset("0", "ERG", 9),
+    "ERG"     -> DexAsset("0000000000000000000000000000000000000000000000000000000000000000", "ERG", 9),
     "SigUSD"  -> DexAsset("03faf2cb329f2e90d6d23b58d91bbb6c046aa143261cc21f52fbe2824bfcbf04", "SigUSD", 2),
     "SigRSV"  -> DexAsset("003bd19d0187117f130b62e1bcab0939929ff5c7709f843c5c4dd158949285d0", "SigRSV", 0),
     "NETA"    -> DexAsset("472c3d4ecaa08fb7392ff041ee2e6af75f4a558810a74b28600549d5392810e8", "NETA", 6),
     "ergopad" -> DexAsset("d71693c49a84fbbecd4908c94813b46514b18b67a99952dc1e6e4791556de413", "ergopad", 2),
+    "Paideia" -> DexAsset("1fd6e032e8476c4aa54c18c1a308dce83940e8f4a28f576440513ed7326ad489", "Paideia", 4),
+    "COMET"   -> DexAsset("0cd8c9f416e5b1ca9f986a7f10a84191dfb85941619e49e53c0dc30ebf83324b", "COMET", 0),
     "Erdoge"  -> DexAsset("36aba4b4a97b65be491cf9f5ca57b5408b0da8d0194f30ec8330d1e8946161c1", "Erdoge", 0),
     "LunaDog" -> DexAsset("5a34d53ca483924b9a6aa0c771f11888881b516a8d1a9cdc535d063fe26d065e", "LunaDog", 8),
     "kushti"  -> DexAsset("fbbaac7337d051c10fc3da0ccb864f4d32d40027551e1c3ea3ce361f39b91e40", "kushti", 0),
@@ -401,5 +407,13 @@ object GuapSwapUtils {
     // Close the file and io-stream
     file.close()  
   }
-    
+
+  /**
+    * Check if the api url is from the local node, either for MAINNET or TESTNET
+    *
+    * @param apiUrl
+    * @return The boolean value if the api url matched the local node url
+    */
+  def isLocalNodeApiUrl(apiUrl: String): Boolean = apiUrl.equals(DEFAULT_LOCAL_NODE_MAINNET_API_URL) || apiUrl.equals(DEFAULT_LOCAL_NODE_TESTNET_API_URL)
+
 }
