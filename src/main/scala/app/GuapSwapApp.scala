@@ -176,7 +176,7 @@ object GuapSwapApp extends CommandIOApp(
         } else {
 
             // Print configuration load status
-            println(Console.RED + "========== CONFIGURATIONS LOADED UNSUCCESSFULLY ==========" + Console.RESET)
+            println(Console.RED + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== CONFIGURATIONS LOADED UNSUCCESSFULLY ==========" + Console.RESET)
 
             // Print Failure exeption
             println(configLoadResult.get)
