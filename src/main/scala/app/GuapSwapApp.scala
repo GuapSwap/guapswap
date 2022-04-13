@@ -38,13 +38,14 @@ object GuapSwapApp extends CommandIOApp(
         if (configLoadResult.isSuccess) {
 
             // Print configuration load status
-            println(Console.GREEN + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== CONFIGURATIONS LOADED SUCCESSFULLY ==========" + Console.RESET)
+            println(Console.GREEN + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} CONFIGURATIONS LOADED SUCCESSFULLY ==========" + Console.RESET)
 
             // Setup Ergo Clients
             val nodeConfig: GuapSwapNodeConfig = configLoadResult.get.node
             val parameters: GuapSwapParameters = configLoadResult.get.parameters
             val explorerURL: String = RestApiErgoClient.getDefaultExplorerUrl(nodeConfig.networkType)
             val ergoClient: ErgoClient = RestApiErgoClient.create(nodeConfig.nodeApi.apiUrl, nodeConfig.networkType, nodeConfig.nodeApi.apiKey, explorerURL)
+            println(Console.GREEN + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} ERGO CLIENT CREATED SUCCESSFULLY ==========" + Console.RESET)
 
             // Print title
             if (GuapSwapUtils.isLocalNodeApiUrl(nodeConfig.nodeApi.apiUrl)) {
@@ -68,17 +69,17 @@ object GuapSwapApp extends CommandIOApp(
                 case GuapSwapCli.GenerateProxyAddress() => {
 
                     // Generate proxy address
-                    println(Console.YELLOW + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== GUAPSWAP PROXY ADDRESS BEING GENERATED ==========" + Console.RESET)
+                    println(Console.YELLOW + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} GUAPSWAP PROXY ADDRESS BEING GENERATED ==========" + Console.RESET)
                     
                     val proxyAddress: String = GuapSwapInteractions.generateProxyAddress(ergoClient, parameters)
                     
-                    println(Console.GREEN + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== GUAPSWAP PROXY ADDRESS GENERATION SUCCESSFULL ==========" + Console.RESET)
+                    println(Console.GREEN + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} GUAPSWAP PROXY ADDRESS GENERATION SUCCESSFULL ==========" + Console.RESET)
 
                     // Print out guapswap save tx status message
-                    println(Console.GREEN + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== GUAPSWAP PROXY ADDRESS SAVED ==========" + Console.RESET)
+                    println(Console.GREEN + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} GUAPSWAP PROXY ADDRESS SAVED ==========" + Console.RESET)
                     GuapSwapUtils.save(proxyAddress, GuapSwapUtils.GUAPSWAP_PROXY_FILE_PATH)
                     
-                    println(Console.BLUE + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== INSERT GUAPSWAP PROXY (P2S) ADDRESS BELOW INTO YOUR MINER ==========" + Console.RESET)
+                    println(Console.BLUE + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} INSERT GUAPSWAP PROXY (P2S) ADDRESS BELOW INTO YOUR MINER ==========" + Console.RESET)
                     println(proxyAddress)
 
                     // Return successful exit code
@@ -91,7 +92,7 @@ object GuapSwapApp extends CommandIOApp(
                     val unlockedSecretStorage: SecretStorage = GuapSwapUtils.unlockSecretStorage(secretStorage) match {
                         case Success(unlockedStorage) => unlockedStorage
                         case Failure(exception) => {
-                            println("Please try swap again.")
+                            println(s"========== ${GuapSwapUtils.getTimeStamp("UTC")} Failed to unlock your secret storage, please try again.")
                             throw exception
                         }
                     }
@@ -99,24 +100,28 @@ object GuapSwapApp extends CommandIOApp(
                     if (onetime) {
 
                         // Print guapswap onetime initiated status message
-                        println(Console.YELLOW + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== GUAPSWAP ONETIME TX INITIATED ==========" + Console.RESET)
+                        println(Console.YELLOW + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} GUAPSWAP ONETIME TX INITIATED ==========" + Console.RESET)
+                        
+                        // Perform tx with secert storage
                         val onetimeSwapTxId: String = GuapSwapInteractions.guapswapOneTime(ergoClient, nodeConfig, parameters, proxyAddress, unlockedSecretStorage)
 
                         // Print out guapswap succeeded status message
-                        println(Console.GREEN + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== GUAPSWAP ONETIME TX SUCCESSFULL ==========" + Console.RESET)
+                        println(Console.GREEN + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} GUAPSWAP ONETIME TX SUCCESSFULL ==========" + Console.RESET)
 
                         // Print out guapswap save tx status message
-                        println(Console.GREEN + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== GUAPSWAP ONETIME TX SAVED ==========" + Console.RESET)
+                        println(Console.GREEN + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} GUAPSWAP ONETIME TX SAVED ==========" + Console.RESET)
                         GuapSwapUtils.save(onetimeSwapTxId, GuapSwapUtils.GUAPSWAP_SWAP_FILE_PATH)
                         
                         // Print tx link to the user
-                        println(Console.BLUE + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== VIEW GUAPSWAP ONETIME TX IN THE ERGO-EXPLORER WITH THE LINK BELOW ==========" + Console.RESET)
+                        println(Console.BLUE + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} VIEW GUAPSWAP ONETIME TX IN THE ERGO-EXPLORER WITH THE LINK BELOW ==========" + Console.RESET)
                         println(GuapSwapUtils.ERGO_EXPLORER_TX_URL_PREFIX + onetimeSwapTxId)
                         
                     } else {
                         
                         // Print guapswap initiated status message
-                        println(Console.YELLOW + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== GUAPSWAP AUTOMATIC MODE STARTED ==========" + Console.RESET)
+                        println(Console.YELLOW + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} GUAPSWAP AUTOMATIC MODE STARTED ==========" + Console.RESET)
+
+                        // Perform tx with secret storage
                         GuapSwapInteractions.guapswapAutomatic(ergoClient, nodeConfig, parameters, proxyAddress, unlockedSecretStorage)
 
                     }
@@ -131,26 +136,26 @@ object GuapSwapApp extends CommandIOApp(
                     val unlockedSecretStorage: SecretStorage = GuapSwapUtils.unlockSecretStorage(secretStorage) match {
                         case Success(unlockedStorage) => unlockedStorage
                         case Failure(exception) => {
-                            println(GuapSwapUtils.getTimeStamp("UTC") + " " + "Please try swap again.")
+                            println(s"========== ${GuapSwapUtils.getTimeStamp("UTC")} Failed to unlock your secret storage, please try again.")
                             throw exception
                         }
                     }
                     
                     // Print guapswap initiating status message
-                    println(Console.YELLOW + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== GUAPSWAP REFUND TX INITIATED ==========" + Console.RESET)
+                    println(Console.YELLOW + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} GUAPSWAP REFUND TX INITIATED ==========" + Console.RESET)
                     //val refundTxId: String = GuapSwapInteractions.guapswapRefund(ergoClient, parameters, proxyAddress, unlockedSecretStorage)
                     val refundTxId: String = GuapSwapInteractions.guapswapRefund(ergoClient, nodeConfig, parameters, proxyAddress, unlockedSecretStorage)
 
                     // TODO: check if tx is even possible
                     // Print out guapswap initiated status message
-                    println(Console.GREEN + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== GUAPSWAP REFUND TX SUCCEEDED ==========" + Console.RESET)
+                    println(Console.GREEN + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} GUAPSWAP REFUND TX SUCCEEDED ==========" + Console.RESET)
 
                     // Print out guapswap save tx status message
-                    println(Console.GREEN + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== GUAPSWAP REFUND TX SAVED ==========" + Console.RESET)
+                    println(Console.GREEN + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} GUAPSWAP REFUND TX SAVED ==========" + Console.RESET)
                     GuapSwapUtils.save(refundTxId, GuapSwapUtils.GUAPSWAP_REFUND_FILE_PATH)
                     
                     // Print tx link to user
-                    println(Console.BLUE + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== VIEW GUAPSWAP REFUND TX IN THE ERGO-EXPLORER WITH THE LINK BELOW ==========" + Console.RESET)
+                    println(Console.BLUE + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} VIEW GUAPSWAP REFUND TX IN THE ERGO-EXPLORER WITH THE LINK BELOW ==========" + Console.RESET)
                     println(GuapSwapUtils.ERGO_EXPLORER_TX_URL_PREFIX + refundTxId)
                     
                     // Return successful exit code
@@ -159,13 +164,13 @@ object GuapSwapApp extends CommandIOApp(
 
                 case GuapSwapCli.List(proxyAddress) => {
                     
-                    println(Console.YELLOW + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== GUAPSWAP LIST INITIATED ==========" + Console.RESET)
-                    println(Console.YELLOW + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== LISTING ALL PROXY BOXES WITH THE GIVEN ADDRESS ==========" + Console.RESET)
+                    println(Console.YELLOW + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} GUAPSWAP LIST INITIATED ==========" + Console.RESET)
+                    println(Console.YELLOW + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} LISTING ALL PROXY BOXES WITH THE GIVEN ADDRESS ==========" + Console.RESET)
 
                     // List boxes at the proxy addres
                     GuapSwapInteractions.guapswapList(ergoClient, proxyAddress)
                     
-                    println(Console.GREEN + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== LISTING COMPLETE ==========" + Console.RESET)
+                    println(Console.GREEN + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} LISTING COMPLETE ==========" + Console.RESET)
 
                     // Return successful exit code
                     IO(ExitCode.Success)
@@ -176,7 +181,7 @@ object GuapSwapApp extends CommandIOApp(
         } else {
 
             // Print configuration load status
-            println(Console.RED + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== CONFIGURATIONS LOADED UNSUCCESSFULLY ==========" + Console.RESET)
+            println(Console.RED + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} CONFIGURATIONS LOADED UNSUCCESSFULLY ==========" + Console.RESET)
 
             // Print Failure exeption
             println(configLoadResult.get)

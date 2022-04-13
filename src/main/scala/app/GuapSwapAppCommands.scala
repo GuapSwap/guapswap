@@ -184,6 +184,8 @@ object GuapSwapAppCommands {
                 case "SigRSV"  => "ERG_2_SigRSV"
                 case "NETA"    => "ERG_2_NETA"
                 case "ergopad" => "ERG_2_ergopad"
+                case "Paideia" => "ERG_2_Paideia"
+                case "COMET"   => "ERG_2_COMET"
                 case "Erdoge"  => "ERG_2_Erdoge"
                 case "LunaDog" => "ERG_2_LunaDog"
             }
@@ -197,10 +199,9 @@ object GuapSwapAppCommands {
                 // Search for the pool box based on the pool Id => THERE SHOULD ONLY BE ONE SUCH BOX
                 var poolBoxes: List[InputBox] = List.empty[InputBox]
                 try {
-                    poolBoxes = ctx.getUnspentBoxesFor(poolContractAddress, 0, 20).asScala.toList
+                    poolBoxes = ctx.getUnspentBoxesFor(poolContractAddress, 0, 100).asScala.toList
                 } catch {
-                    case exception: IllegalArgumentException => {
-                        println(GuapSwapUtils.getTimeStamp("UTC") + " " + "No ErgoDex pool boxes exist.")
+                    case exception: Throwable => {
                         throw exception
                     }
                 }
@@ -209,7 +210,7 @@ object GuapSwapAppCommands {
                 val poolBox: InputBox = poolBoxes.filter(poolbox => poolbox.getTokens().get(0).getId().toString.equals(poolIdSearch))(0)
                 
                 // Search for all the proxy boxes 
-                val proxyBoxes: List[InputBox] = ctx.getUnspentBoxesFor(proxyContractAddress, 0, 50).asScala.toList
+                val proxyBoxes: List[InputBox] = ctx.getUnspentBoxesFor(proxyContractAddress, 0, 100).asScala.toList
                 val totalPayout: Long = proxyBoxes.foldLeft(0L)((acc, proxybox) => acc + proxybox.getValue())
 
                 // Generate the swap sell parameters
@@ -296,7 +297,7 @@ object GuapSwapAppCommands {
         def guapswapAutomatic(ergoClient: ErgoClient, nodeConfig: GuapSwapNodeConfig, parameters: GuapSwapParameters, proxyAddress: String, unlockedSecretStorage: SecretStorage): Unit = {
             
             // Print notification statement
-            println(Console.BLUE + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== Program will run INDEFINITELY and will NOT ask for confirmation to SIGN the TX. To TERMINATE execution, close the terminal session. ==========" + Console.RESET)
+            println(Console.BLUE + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} Program will run INDEFINITELY and will NOT ask for confirmation to SIGN the TX. To TERMINATE execution, close the terminal session. ==========" + Console.RESET)
 
             // Convert swap interval into milliseconds
             val milliSecondsPerMinute: Long = 1000 * 60
@@ -316,27 +317,29 @@ object GuapSwapAppCommands {
 
                 try {
                     // Print guapswap automatic initiated status message
-                    println(Console.YELLOW + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== GUAPSWAP AUTOMATIC TX INITIATED ==========" + Console.RESET)
+                    println(Console.YELLOW + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} GUAPSWAP AUTOMATIC TX INITIATED ==========" + Console.RESET)
+
+                    // Perform onetime tx with secret storage
                     val automaticSwapTxId: String = guapswapOneTime(ergoClient, nodeConfig, parameters, proxyAddress, unlockedSecretStorage)
 
                     // Perform a swap
-                    println(Console.GREEN + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== GUAPSWAP AUTOMATIC TX SUCCESSFULL ==========" + Console.RESET)
+                    println(Console.GREEN + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} GUAPSWAP AUTOMATIC TX SUCCESSFULL ==========" + Console.RESET)
 
                     // Print out guapswap save tx status message
-                    println(Console.GREEN + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== GUAPSWAP AUTOMATIC TX SAVED ==========" + Console.RESET)
+                    println(Console.GREEN + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} GUAPSWAP AUTOMATIC TX SAVED ==========" + Console.RESET)
                     GuapSwapUtils.save(automaticSwapTxId, GuapSwapUtils.GUAPSWAP_SWAP_FILE_PATH)
                             
                     // Print tx link to the user
-                    println(Console.BLUE + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== VIEW GUAPSWAP AUTOMATIC TX IN THE ERGO-EXPLORER WITH THE LINK BELOW ==========" + Console.RESET)
+                    println(Console.BLUE + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} VIEW GUAPSWAP AUTOMATIC TX IN THE ERGO-EXPLORER WITH THE LINK BELOW ==========" + Console.RESET)
                     println(GuapSwapUtils.ERGO_EXPLORER_TX_URL_PREFIX + automaticSwapTxId)
 
                 } catch {
-                    case noProxyBoxes: IndexOutOfBoundsException => println(Console.RED + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== INVALID INPUTS, CHECK CONFIG FILE OR PROXY BOX ==========" + Console.RESET)
+                    case noProxyBoxes: IndexOutOfBoundsException => println(Console.RED + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} INVALID INPUTS, CHECK CONFIG FILE OR PROXY BOX ==========" + Console.RESET)
                     case error: Throwable => error
                 }
             
                 // Print warning and put the thread to sleep for the alloted interval of time
-                println(Console.BLUE + GuapSwapUtils.getTimeStamp("UTC") + " " + s"========== AUTOMATIC TX ATTEMPT WILL OCCUR AGAIN WITHIN THE NEXT ${minutes} MINUTES ==========" + Console.RESET)
+                println(Console.BLUE + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} AUTOMATIC TX ATTEMPT WILL OCCUR AGAIN WITHIN THE NEXT ${minutes} MINUTES ==========" + Console.RESET)
                 Thread.sleep(time)
             }   
 
@@ -361,8 +364,8 @@ object GuapSwapAppCommands {
                  // Convert proxy contract P2S address to an Address
                 val proxyContractAddress: Address = Address.create(proxyAddress)
 
-                // Search for all the proxy boxes => assumes a max payout of 1/hr for one week (i.e. 168 maxmimum boxes)
-                val proxyBoxes:                     List[InputBox]          =   ctx.getUnspentBoxesFor(proxyContractAddress, 0, 168).asScala.toList
+                // Search for all proxy boxes
+                val proxyBoxes:                     List[InputBox]          =   ctx.getUnspentBoxesFor(proxyContractAddress, 0, 1000).asScala.toList
                 val totalPayout:                    Long                    =   proxyBoxes.foldLeft(0L)((acc, proxybox) => acc + proxybox.getValue())
                 val guapSwapMinerFee:               Long                    =   GuapSwapUtils.convertMinerFee(parameters.guapswapProtocolSettings.serviceFees.protocolMinerFee)
                 val refundValue:                    Long                    =   totalPayout - guapSwapMinerFee
@@ -435,17 +438,17 @@ object GuapSwapAppCommands {
 
                 try {
 
-                    // Search for all the proxy boxes => assumes a max payout of 1/hr for one week (i.e. 168 maxmimum boxes)
-                    val proxyBoxes: List[InputBox] = ctx.getUnspentBoxesFor(proxyContractAddress, 0, 168).asScala.toList
+                    // Search for all the proxy boxes
+                    val proxyBoxes: List[InputBox] = ctx.getUnspentBoxesFor(proxyContractAddress, 0, 100).asScala.toList
                 
                     // Print the proxy boxes
-                    println(GuapSwapUtils.getTimeStamp("UTC") + " " + "START")
+                    println(s"========== ${GuapSwapUtils.getTimeStamp("UTC")} START ==========")
                     proxyBoxes.foreach(proxy => println(proxy.toJson(true)))
-                    println(GuapSwapUtils.getTimeStamp("UTC") + " " + "END")
+                    println(s"========== ${GuapSwapUtils.getTimeStamp("UTC")} END ==========")
 
                 } catch {
                     case noNodeConnect: ErgoClientException => noNodeConnect 
-                    case noIndex: IndexOutOfBoundsException =>  println(Console.RED + GuapSwapUtils.getTimeStamp("UTC") + " " + "========== NO PROXY BOXES AT THE GIVEN ADDRESS FOUND ==========" + Console.RESET)
+                    case noIndex: IndexOutOfBoundsException =>  println(Console.RED + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} NO PROXY BOXES AT THE GIVEN ADDRESS FOUND ==========" + Console.RESET)
                 }
             
             })

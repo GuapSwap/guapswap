@@ -15,7 +15,7 @@
         "guapswapProtocolSettings": {
             "userAddress": "",
             "serviceFees": {
-                "protocolFeePercentage": 0.0025,
+                "protocolFeePercentage": 1.0,
                 "protocolUIFeePercentage": 0.0,
                 "protocolMinerFee": 0.005
             },
@@ -24,8 +24,8 @@
         },
         "dexSettings": {
             "ergodexSettings": {
-                "swapAssetTicker": "",
-                "slippageTolerancePercentage": 3,
+                "swapAssetTicker": "COMET",
+                "slippageTolerancePercentage": 3.0,
                 "nitro": 1.2,
                 "ergodexMinerFee": 0.005 
             }

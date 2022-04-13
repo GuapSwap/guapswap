@@ -32,8 +32,8 @@ object GuapSwapUtils {
   // Constant representing the storage location within the project repository of the guapswap_config.json file and guapswap_proxy.json file
   final val GUAPSWAP_CONFIG_FILE_PATH:  String = "storage/guapswap_config.json"
   final val GUAPSWAP_PROXY_FILE_PATH:   String = "storage/guapswap_proxy.log"
-  final val GUAPSWAP_SWAP_FILE_PATH:   String = "storage/guapswap_swap.log"
-  final val GUAPSWAP_REFUND_FILE_PATH: String = "storage/guapswap_refund.log"
+  final val GUAPSWAP_SWAP_FILE_PATH:    String = "storage/guapswap_swap.log"
+  final val GUAPSWAP_REFUND_FILE_PATH:  String = "storage/guapswap_refund.log"
 
   // Ergo Explorer URL
   final val ERGO_EXPLORER_TX_URL_PREFIX: String = "https://explorer.ergoplatform.com/en/transactions/"
@@ -95,8 +95,7 @@ object GuapSwapUtils {
     * @return Converted ERG value in nanoErgs.
     */
   def ergToNanoErg(erg: Double): Long = {
-    val fraction: (Long, Long) = decimalToFraction(erg)
-    val nanoergs: Long = (fraction._1 * Parameters.OneErg) / fraction._2
+    val nanoergs: Long = BigDecimal(erg * Parameters.OneErg).toLong
     nanoergs
   }
 
@@ -124,9 +123,9 @@ object GuapSwapUtils {
     * @param protocolUIFeePercentage
     * @return The numerator and denominator of the total protocol fee percentage
     */
-  def calculateTotalProtocolFeePercentage(protocolFeePercentage: Double, protocolUIFeePercentage: Double): (Long, Long) = {
-    val percentageSum: Double = protocolFeePercentage + protocolUIFeePercentage
-    val fraction: (Long, Long) = decimalToFraction(percentageSum)
+  def calculateTotalProtocolFeePercentage(protocolFeePercentageConfig: Double, protocolUIFeePercentageConfig: Double): (Long, Long) = {
+    val totalProtocolFeePercentageSum: Double = (protocolFeePercentageConfig + protocolUIFeePercentageConfig) / 100D
+    val fraction: (Long, Long) = decimalToFraction(totalProtocolFeePercentageSum)
     fraction
   }
 
@@ -138,7 +137,11 @@ object GuapSwapUtils {
     * @param payout
     * @return Total protocol fee in nanoErgs.
     */
-  def calculateTotalProtocolFee(protocolFeePercentage: Double, protocolUIFeePercentage: Double, payout: Long): Long = ((protocolFeePercentage + protocolUIFeePercentage) * payout.toDouble).toLong
+  def calculateTotalProtocolFee(protocolFeePercentageConfig: Double, protocolUIFeePercentageConfig: Double, payout: Long): Long = {
+    val totalProtocolFeePercentage: (Long, Long) = calculateTotalProtocolFeePercentage(protocolFeePercentageConfig, protocolUIFeePercentageConfig)
+    val totalProtocolFee: Long = ((totalProtocolFeePercentage._1 * payout) / totalProtocolFeePercentage._2).toLong
+    totalProtocolFee
+  }
 
   /**
     * Calculate the service fee, this include the total protocol fee and the protocol miner fee
@@ -157,7 +160,6 @@ object GuapSwapUtils {
     * @return The minimum value in nanoErgs that the transaction can cost, on both the GuapSwap stage and dex stage.
     */
   def minValueOfTotalFees(serviceFee: Long, totalDexFee: Long): Long = serviceFee + totalDexFee
-
 
   /**
     * Method to calculate the base amount to be swapped at the dex.
@@ -206,7 +208,7 @@ object GuapSwapUtils {
     */
   def loadSecretStorage(): Try[SecretStorage] = Try {
    
-    println(Console.YELLOW + "========== LOADING SECRET STORAGE ==========" + Console.RESET)
+    println(Console.YELLOW + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} LOADING SECRET STORAGE ==========" + Console.RESET)
   
     val secretDirectory: File = new File(DEFAULT_SECRET_STORAGE_DIRECTORY)
     
@@ -235,16 +237,16 @@ object GuapSwapUtils {
     * @return The generated secret storage
     */
   def generateSecretStorage(): SecretStorage = {
-    println(Console.YELLOW + "========== GENERATING SECRET STORAGE ==========" + Console.RESET)
-    println(Console.YELLOW + "========== PLEASE CREATE A PASSWORD FOR SECRET STORAGE ==========" + Console.RESET)
+    println(Console.YELLOW + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} GENERATING SECRET STORAGE ==========" + Console.RESET)
+    println(Console.YELLOW + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} PLEASE CREATE A PASSWORD FOR SECRET STORAGE ==========" + Console.RESET)
     val password: String = System.console().readPassword().mkString
     
     val mnemonicPhrase: Array[Char] = Mnemonic.generateEnglishMnemonic().toCharArray()
     val mnemonic: Mnemonic = Mnemonic.create(SecretString.create(mnemonicPhrase), SecretString.empty())
     val generatedSecretStorage: SecretStorage = SecretStorage.createFromMnemonicIn(DEFAULT_SECRET_STORAGE_DIRECTORY, mnemonic, password)
     
-    println(Console.GREEN + "========== SECRET STORAGE CREATED ==========" + Console.RESET)
-    println(Console.BLUE + "========== YOUR MNEMONIC AND SECRET STORAGE ARE THE FOLLOWING ==========" + Console.RESET)
+    println(Console.GREEN + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} SECRET STORAGE CREATED ==========" + Console.RESET)
+    println(Console.BLUE + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} YOUR MNEMONIC AND SECRET STORAGE ARE THE FOLLOWING ==========" + Console.RESET)
     println("Mnemonic Phrase: " + mnemonic.getPhrase().toStringUnsecure())
     println("Secret Storage Directory: " + generatedSecretStorage.getFile().getPath())
     
@@ -259,20 +261,20 @@ object GuapSwapUtils {
     * @return Unlocked secret storage.
     */
   def unlockSecretStorage(lockedSecretStorage: SecretStorage): Try[SecretStorage] = Try {
-    println(Console.YELLOW + "===== PLEASE ENTER YOUR ENCRYPTION PASSWORD TO UNLOCK SECRET STORAGE" + Console.RESET)
+    println(Console.YELLOW + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} PLEASE ENTER YOUR ENCRYPTION PASSWORD TO UNLOCK SECRET STORAGE ==========" + Console.RESET)
     val passPhrase: String = System.console().readPassword().mkString
     
     // Unlock secret storage
-    println(Console.YELLOW + "========== UNLOCKING SECRET STORAGE ==========")
+    println(Console.YELLOW + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} UNLOCKING SECRET STORAGE ==========")
     try {
         lockedSecretStorage.unlock(passPhrase)
     } catch {
         case exception: RuntimeException => {
-            println(Console.RED + "========== WRONG PASSWORD ==========" + Console.RESET)
+            println(Console.RED + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} WRONG PASSWORD ==========" + Console.RESET)
             throw exception
         }                   
     }
-    println(Console.GREEN + "========== SECRET STORAGE UNLOCKED ==========")
+    println(Console.GREEN + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} SECRET STORAGE UNLOCKED ==========")
     lockedSecretStorage
   }
 
@@ -287,12 +289,12 @@ object GuapSwapUtils {
     val checkSecretStorage: SecretStorage = GuapSwapUtils.loadSecretStorage() match {
         
       case Success(loadedSecretStorage) => {
-        println(Console.GREEN + "========== SECRET STORAGE EXISTS ==========" + Console.RESET)
+        println(Console.GREEN + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} SECRET STORAGE EXISTS ==========" + Console.RESET)
         loadedSecretStorage
       }
 
       case Failure(exception) => {
-          println(Console.RED + "========== SECRET STORAGE DOES NOT EXIST ==========" + Console.RESET)
+          println(Console.RED + s"========== ${GuapSwapUtils.getTimeStamp("UTC")} SECRET STORAGE DOES NOT EXIST ==========" + Console.RESET)
           
           // Generate secret storage
           val generatedSecretStorage: SecretStorage = generateSecretStorage()
