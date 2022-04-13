@@ -11,11 +11,46 @@ GuapSwap CLI for the Ergo miner.
 
 ### Usage Steps
 
+#### Installing
+
 1. Download the latest release to minimize your own risk, or clone/download repository if you are adventurous. 
 2. Install Java (JRE, JDK, or OpenJDK).
-3. Modify the settings in the config file, and insert one of the available token tickers.
-5. Run `java -jar guapswap-1.0.1-beta.jar --help` to get command usage directions. Use the `--help` flag after any command to get usage directions.
-6. If you would like to compile the jar yourself, download sbt and run `sbt assembly` within the repository/source folder.
+3. If you would like to compile the jar yourself, download sbt and run `sbt assembly` within the repository/source folder.
+
+#### Configurations
+
+1. Modify the settings in the `guapswap_config.json` file
+2. Change the `apiUrl` to `http://127.0.0.1:9053/` if you are running your own node. This will run GuapSwap CLI in ronin mode.
+3. Add your PK to the `userAddress` field.
+4. Increase the `swapIntervalInHours` field if you want to increase the time between swaps when running GuapSwap CLI in automatic mode.
+5. Inser a valid ErgoDex asset ticker, from the list of available tickers below, into the `swapAssetTicker` field.
+6. If you so choose, feel free to modify the dex settings at your own risk.
+7. Run `java -jar guapswap-1.1.0-beta.jar --help` to get command usage directions. Use the `--help` flag after any command to get usage directions.
+
+#### GuapSwap CLI Command Usage
+
+1. Run `java -jar guapswap-1.1.0-beta.jar --help` to get command usage directions. Use the `--help` flag after any command to get usage directions.
+
+##### Generate Proxy Address
+
+1. Run `java -jar guapswap-1.1.0-beta.jar generate` to generate a proxy address.
+2. Use the generated proxy address instead of your PK to receive your mining payout rewards.
+
+##### Onetime Swap
+
+1. Run `java -jar guapswap-1.1.0-beta.jar swap --onetime <proxy_address>` to make a onetime swap with the given proxy address.
+
+##### Automatic Swap
+
+1. Run `java -jar guapswap-1.1.0-beta.jar swap <proxy_address>` to run GuapSwap CLI in automatic mode. The swaps will occur according to the `swapIntervalInHours` set in the `guapswap_config.json` file.
+
+##### Refund
+
+1. Run `java -jar guapswap-1.1.0-beta.jar refund <proxy_address>` to return all funds locked at the given proxy address to your PK wallet.
+
+##### List
+
+1. Run `java -jar guapswap-1.1.0-beta.jar list <proxy_address>` to list all eUTXO boxes at the given proxy address.
 
 ### Usage WARNING
 
@@ -32,8 +67,10 @@ GuapSwap CLI for the Ergo miner.
 2. "SigRSV"
 3. "NETA"
 4. "ergopad"
-5. "Erdoge"
-6. "LunaDog"
+5. "Paideia"
+6. "COMET"
+7. "Erdoge"
+8. "LunaDog"
 
 ## Pool Compatibility
 

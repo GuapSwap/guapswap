@@ -345,7 +345,6 @@ object GuapSwapAppCommands {
 
         }
 
-
         /**
           * GuapSwap Refund transaction.
           *
