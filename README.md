@@ -54,15 +54,17 @@ GuapSwap CLI for the Ergo miner.
 
 ### Usage WARNING
 
-1. Please have at least 0.1 ERG at the proxy address before deciding to initiate a onetime swap, otherwise you will need to fund it with more ERG. This is to ensure that there are enough funds to pay for the protocol fee and all of the ErgoDex fees.
+Please have at least 0.1 ERG at the proxy address before deciding to initiate a swap, otherwise you will need to fund it with more ERG. This is to ensure that there are enough funds to pay for the protocol fee and all of the dex fees. The value may also need to be higher depending on the token to be swapped, since some assets require a higher minimum amount of ERG to swap for them.
 
 ### Available Commands
+
 1. `generate`
 2. `swap [--onetime] <proxy_address>`
 3. `refund <proxy_address>`
 4. `list <proxy_address>`
 
 ### Available Swap Token Tickers
+
 1. "SigUSD"
 2. "SigRSV"
 3. "NETA"
@@ -85,7 +87,7 @@ GuapSwap CLI for the Ergo miner.
 - rkdn.app
 - solopool.org
 
-### Known incompatible pools (do not accept proxy address)
+### Known incompatible pools (i.e. they do not accept P2S proxy addresses)
 
 - flypool.org
 - 2miners.com
@@ -94,3 +96,12 @@ GuapSwap CLI for the Ergo miner.
 - enigmapool.com
 - cruxpool.com
 - fairhash.org
+
+## Reporting Issues
+
+Consider joining our [Discord](https://discord.com/invite/EfXsE4v2NM) channel, we welcome any and all feedback. We also have a `beta-testers` channel if you would like to try out pre-release versions of GuapSwap CLI.
+
+## Support
+
+If you would like to support the team and the project, please consider sending some ERG our way at the following address: 
+`9gspiMa13K91MAVEhDM5iyjRePZSc8K42jJFTm8RkwyQBUPZ6BU`
