@@ -101,7 +101,7 @@ Please have at least 0.1 ERG at the proxy address before deciding to initiate a 
 
 1. Join our [Discord](https://discord.com/invite/EfXsE4v2NM) channel, we welcome any and all feedback. 
 2. Join the `beta-testers` channel if you would like to try out pre-release versions of GuapSwap CLI.
-3. Feel free to create a GitHub issue or filling out the Bug Report issue to let us know of any bugs you encounter while using GuapSwap CLI.
+3. Feel free to create a GitHub issue or fill out the Bug Report issue to let us know of any errors you encounter while using GuapSwap CLI.
 
 ## Support
 
