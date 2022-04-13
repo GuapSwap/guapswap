@@ -20,11 +20,11 @@
                 "protocolMinerFee": 0.005
             },
             "swapIntervalInHours": 1,
-            "dexChoice": "ERGODEX"
+            "dexChoice": "ErgoDex"
         },
         "dexSettings": {
             "ergodexSettings": {
-                "swapAssetTicker": "COMET",
+                "swapAssetTicker": "",
                 "slippageTolerancePercentage": 3.0,
                 "nitro": 1.2,
                 "ergodexMinerFee": 0.005 
