@@ -24,7 +24,7 @@ import org.ergoplatform.appkit.NetworkType
 object GuapSwapApp extends CommandIOApp(
     name = "guapswap",
     header = "GuapSwap CLI for the Ergo miner.",
-    version = "1.1.0-beta"
+    version = "1.1.1-beta"
 ) {
 
     override def main: Opts[IO[ExitCode]] = {

@@ -364,7 +364,7 @@ object GuapSwapAppCommands {
                 val proxyContractAddress: Address = Address.create(proxyAddress)
 
                 // Search for all proxy boxes
-                val proxyBoxes:                     List[InputBox]          =   ctx.getUnspentBoxesFor(proxyContractAddress, 0, 1000).asScala.toList
+                val proxyBoxes:                     List[InputBox]          =   ctx.getUnspentBoxesFor(proxyContractAddress, 0, 100).asScala.toList
                 val totalPayout:                    Long                    =   proxyBoxes.foldLeft(0L)((acc, proxybox) => acc + proxybox.getValue())
                 val guapSwapMinerFee:               Long                    =   GuapSwapUtils.convertMinerFee(parameters.guapswapProtocolSettings.serviceFees.protocolMinerFee)
                 val refundValue:                    Long                    =   totalPayout - guapSwapMinerFee

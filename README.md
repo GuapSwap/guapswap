@@ -25,32 +25,32 @@ GuapSwap CLI for the Ergo miner.
 4. Increase the `swapIntervalInHours` field if you want to increase the time between swaps when running GuapSwap CLI in automatic mode.
 5. Inser a valid ErgoDex asset ticker, from the list of available tickers below, into the `swapAssetTicker` field.
 6. If you so choose, feel free to modify the dex settings at your own risk.
-7. Run `java -jar guapswap-1.1.0-beta.jar --help` to get command usage directions. Use the `--help` flag after any command to get usage directions.
+7. Run `java -jar guapswap-<version>.jar --help` to get command usage directions. Use the `--help` flag after any command to get usage directions.
 
 #### GuapSwap CLI Command Usage
 
-1. Run `java -jar guapswap-1.1.0-beta.jar --help` to get command usage directions. Use the `--help` flag after any command to get usage directions.
+1. Run `java -jar guapswap-<version>.jar --help` to get command usage directions. Use the `--help` flag after any command to get usage directions.
 
 ##### Generate Proxy Address
 
-1. Run `java -jar guapswap-1.1.0-beta.jar generate` to generate a proxy address.
+1. Run `java -jar guapswap-<version>.jar generate` to generate a proxy address.
 2. Use the generated proxy address instead of your PK to receive your mining payout rewards.
 
 ##### Onetime Swap
 
-1. Run `java -jar guapswap-1.1.0-beta.jar swap --onetime <proxy_address>` to make a onetime swap with the given proxy address.
+1. Run `java -jar guapswap-<version>.jar swap --onetime <proxy_address>` to make a onetime swap with the given proxy address.
 
 ##### Automatic Swap
 
-1. Run `java -jar guapswap-1.1.0-beta.jar swap <proxy_address>` to run GuapSwap CLI in automatic mode. The swaps will occur according to the `swapIntervalInHours` set in the `guapswap_config.json` file.
+1. Run `java -jar guapswap-<version>.jar swap <proxy_address>` to run GuapSwap CLI in automatic mode. The swaps will occur according to the `swapIntervalInHours` set in the `guapswap_config.json` file.
 
 ##### Refund
 
-1. Run `java -jar guapswap-1.1.0-beta.jar refund <proxy_address>` to return all funds locked at the given proxy address to your PK wallet.
+1. Run `java -jar guapswap-<version>.jar refund <proxy_address>` to return all funds locked at the given proxy address to your PK wallet.
 
 ##### List
 
-1. Run `java -jar guapswap-1.1.0-beta.jar list <proxy_address>` to list all eUTXO boxes at the given proxy address.
+1. Run `java -jar guapswap-<version>.jar list <proxy_address>` to list all eUTXO boxes at the given proxy address.
 
 ### Usage WARNING
 
@@ -76,31 +76,31 @@ Please have at least 0.1 ERG at the proxy address before deciding to initiate a 
 
 ## Pool Compatibility
 
-### Known compatible pools
+### Known Compatible Pools
 
-- getblok.io
-- nanopool.org
-- herominers.com
-- 666pool.com
-- woolypooly.com
-- k1pool.com
-- rkdn.app
-- solopool.org
+- [getblok.io](https://getblok.io)
+- [nanopool.org](https://nanopool.org)
+- [herominers.com](https://herominers.com)
+- [666pool.com](https://666pool.com)
+- [woolypooly.com](https://woolypooly.com)
+- [k1pool.com](https://k1pool.com)
+- [rkdn.app](https://rkdn.app)
+- [solopool.org](https://solopool.org)
 
-### Known incompatible pools (i.e. they do not accept P2S proxy addresses)
+### Known Incompatible Pools (i.e. they do not accept P2S proxy addresses)
 
-- flypool.org
-- 2miners.com
-- f2pool.com
-- leafpool.com
-- enigmapool.com
-- cruxpool.com
-- fairhash.org
+- [flypool.org](https://flypool.org)
+- [2miners.com](https://2miners.com)
+- [f2pool.com](https://f2pool.com)
+- [leafpool.com](https://leafpool.com)
+- [enigmapool.com](https://enigmapool.com)
+- [cruxpool.com](https://cruxpool.com)
+- [fairhash.org](https://fairhash.org)
 
 ## Reporting Issues
 
 1. Join our [Discord](https://discord.com/invite/EfXsE4v2NM) channel, we welcome any and all feedback. 
-2. Join the `beta-testers` channel if you would like to try out pre-release versions of GuapSwap CLI.
+2. Join the `#beta-testers` channel if you would like to try out pre-release versions of GuapSwap CLI.
 3. Feel free to create a GitHub issue or fill out the Bug Report issue to let us know of any errors you encounter while using GuapSwap CLI.
 
 ## Support
