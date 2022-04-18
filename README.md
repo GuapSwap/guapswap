@@ -97,6 +97,10 @@ Please have at least 0.1 ERG at the proxy address before deciding to initiate a 
 - [cruxpool.com](https://cruxpool.com)
 - [fairhash.org](https://fairhash.org)
 
+### Walkthrough
+
+If you would like to watch a walkthrough for GuapSwap CLI, consider subscribing to our YouTube channel [here](https://www.youtube.com/channel/UC9vdWQ_lLb41BO2hG3SvZOA). If a tutorial video is not already out, then it may be added soon.
+
 ## Reporting Issues
 
 1. Join our [Discord](https://discord.com/invite/EfXsE4v2NM) channel, we welcome any and all feedback. 
