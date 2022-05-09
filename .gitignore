@@ -9,3 +9,4 @@ project/.bloop
 project/project
 project/target
 project/metals.sbt
+storage/.secretStorage

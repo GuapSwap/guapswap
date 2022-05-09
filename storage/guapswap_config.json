@@ -14,17 +14,12 @@
     "parameters": {
         "guapswapProtocolSettings": {
             "userAddress": "",
-            "serviceFees": {
-                "protocolFeePercentage": 0.0025,
-                "protocolUIFeePercentage": 0.0,
-                "protocolMinerFee": 0.002
-            },
             "swapIntervalInHours": "1"
         },
-        "swapAssetSettings": {
-            "swapAssets": {
-                "swapAsset1": {
-                    "swapAssetTicker": "SigUSD",
+        "swapTokenSettings": {
+            "swapTokens": {
+                "swapToken1": {
+                    "swapTokenTicker": "SigUSD",
                     "percentageOfPayout": 0.8,
                     "recipientAddress": "",
                     "dexSettings": {
@@ -36,8 +31,8 @@
                         }
                     }
                 },
-                "swapAsset2": {
-                    "swapAssetTicker": "NETA",
+                "swapToken2": {
+                    "swapTokenTicker": "NETA",
                     "percentageOfPayout": 0.2,
                     "recipientAddress": "",
                     "dexSettings": {
@@ -49,8 +44,8 @@
                         }
                     }
                 },
-                "swapAsset3": {
-                    "swapAssetTicker": "ergopad",
+                "swapToken3": {
+                    "swapTokenTicker": "ergopad",
                     "percentageOfPayout": 0.2,
                     "recipientAddress": "",
                     "dexSettings": {
