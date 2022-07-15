@@ -11,20 +11,22 @@
         },
         "networkType": "MAINNET"      
     },
-    "parameters": {
+    "settings": {
         "guapswapProtocolSettings": {
             "userAddress": "",
             "swapIntervalInHours": "1"
         },
-        "swapTokenSettings": {
+        "guapswapTokenSettings": {
             "swapTokens": {
                 "swapToken1": {
-                    "swapTokenTicker": "SigUSD",
-                    "percentageOfPayout": 0.8,
-                    "recipientAddress": "",
-                    "dexSettings": {
+                    "swapTokenParams": {
+                        "swapTokenTicker": "SigUSD",
+                        "percentageOfPayout": 0.8,
+                        "receiverAddress": ""
+                    },
+                    "dexParams": {
                         "dexChoice": "ErgoDex",
-                        "ergoDexSettings": {
+                        "ergodexParams": {
                             "slippageTolerancePercentage": 3,
                             "nitro": 1.2,
                             "dexMinerFee": 0.002
@@ -34,7 +36,7 @@
                 "swapToken2": {
                     "swapTokenTicker": "NETA",
                     "percentageOfPayout": 0.2,
-                    "recipientAddress": "",
+                    "receiverAddress": "",
                     "dexSettings": {
                         "dexChoice": "ErgoDex",
                         "ergoDexSettings": {
@@ -47,7 +49,7 @@
                 "swapToken3": {
                     "swapTokenTicker": "ergopad",
                     "percentageOfPayout": 0.2,
-                    "recipientAddress": "",
+                    "receiverAddress": "",
                     "dexSettings": {
                         "dexChoice": "ErgoDex",
                         "ergoDexSettings": {
