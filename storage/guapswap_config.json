@@ -14,48 +14,54 @@
     "settings": {
         "guapswapProtocolSettings": {
             "userAddress": "",
-            "swapIntervalInHours": "1"
+            "guapswapMinerFee": 0.002,
+            "swapIntervalInHours": 1
         },
         "guapswapTokenSettings": {
-            "swapTokens": {
-                "swapToken1": {
-                    "swapTokenParams": {
-                        "swapTokenTicker": "SigUSD",
-                        "percentageOfPayout": 0.8,
-                        "receiverAddress": ""
+            "guapswaps": {
+                "guapswap1": {
+                    "guapswapParams": {
+                        "baseTokenTicker": "ERG"
                     },
-                    "dexParams": {
-                        "dexChoice": "ErgoDex",
-                        "ergodexParams": {
-                            "slippageTolerancePercentage": 3,
-                            "nitro": 1.2,
-                            "dexMinerFee": 0.002
-                        }
-                    }
-                },
-                "swapToken2": {
-                    "swapTokenTicker": "NETA",
-                    "percentageOfPayout": 0.2,
-                    "receiverAddress": "",
-                    "dexSettings": {
-                        "dexChoice": "ErgoDex",
-                        "ergoDexSettings": {
-                            "slippageTolerancePercentage": 3,
-                            "nitro": 1.2,
-                            "dexMinerFee": 0.002
-                        }
-                    }
-                },
-                "swapToken3": {
-                    "swapTokenTicker": "ergopad",
-                    "percentageOfPayout": 0.2,
-                    "receiverAddress": "",
-                    "dexSettings": {
-                        "dexChoice": "ErgoDex",
-                        "ergoDexSettings": {
-                            "slippageTolerancePercentage": 3,
-                            "nitro": 1.2,
-                            "dexMinerFee": 0.002
+                    "swapTokens": {
+                        "swapToken1": {
+                            "swapTokenTicker": "SigUSD",
+                            "percentageOfBaseTokenPayout": 0.8,
+                            "receiverAddress": "",
+                            "dexParams": {
+                                "dexChoice": "ErgoDex",
+                                "ergodexParams": {
+                                    "slippageTolerancePercentage": 3,
+                                    "nitro": 1.2,
+                                    "dexMinerFee": 0.002
+                                }
+                            }
+                        },
+                        "swapToken2": {
+                            "swapTokenTicker": "NETA",
+                            "percentageOfBaseTokenPayout": 0.2,
+                            "receiverAddress": "",
+                            "dexSettings": {
+                                "dexChoice": "ErgoDex",
+                                "ergoDexSettings": {
+                                    "slippageTolerancePercentage": 3,
+                                    "nitro": 1.2,
+                                    "dexMinerFee": 0.002
+                                }
+                            }
+                        },
+                        "swapToken3": {
+                            "swapTokenTicker": "ergopad",
+                            "percentageOfBaseTokenPayout": 0.2,
+                            "receiverAddress": "",
+                            "dexSettings": {
+                                "dexChoice": "ErgoDex",
+                                "ergoDexSettings": {
+                                    "slippageTolerancePercentage": 3,
+                                    "nitro": 1.2,
+                                    "dexMinerFee": 0.002
+                                }
+                            }
                         }
                     }
                 }
