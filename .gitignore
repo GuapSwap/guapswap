@@ -4,6 +4,7 @@
 .metals
 .bloop
 .bsp
+.idea
 target
 project/.bloop
 project/project
